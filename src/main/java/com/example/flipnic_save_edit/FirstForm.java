@@ -6,10 +6,7 @@ import javafx.beans.value.ObservableValueBase;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -66,6 +63,36 @@ public class FirstForm {
     @FXML
     private TableColumn<ScoreRow, String> combosColumn;
 
+    // unlocks
+    private final ToggleGroup grp = new ToggleGroup();
+    @FXML
+    private RadioButton freeRad;
+    @FXML
+    private RadioButton originalRad;
+
+    @FXML
+    private CheckBox bioACheck;
+    @FXML
+    private CheckBox bioBCheck;
+    @FXML
+    private CheckBox metACheck;
+    @FXML
+    private CheckBox metBCheck;
+    @FXML
+    private CheckBox optACheck;
+    @FXML
+    private CheckBox optBCheck;
+    @FXML
+    private CheckBox geoACheck;
+    @FXML
+    private CheckBox evoACheck;
+    @FXML
+    private CheckBox evoBCheck;
+    @FXML
+    private CheckBox evoCCheck;
+    @FXML
+    private CheckBox evoDCheck;
+
 
     private FlipnicSave fs;
 
@@ -77,6 +104,8 @@ public class FirstForm {
     private void initialize() {
         List<String> strings = new ArrayList<>(Arrays.asList(this.gameModes));
         gameModeSelector.setItems(FXCollections.observableList(strings));
+        freeRad.setToggleGroup(grp);
+        originalRad.setToggleGroup(grp);
     }
 
     private MainApp mainApp;
@@ -103,6 +132,7 @@ public class FirstForm {
             rightNudgeLabel.setText(fs.getRightNudge());
             leftFlipperLabel.setText(fs.getLeftFlipper());
             rightFlipperLabel.setText(fs.getRightFlipper());
+            onGameModeChanged();
         } else {
             // information
             checkSumLabel.setText("Not loaded");
@@ -119,6 +149,29 @@ public class FirstForm {
             leftFlipperLabel.setText("L2");
             rightFlipperLabel.setText("L2");
         }
+    }
+
+    @FXML
+    private void onGameModeChanged() {
+        boolean[] checks;
+        if (freeRad.isSelected()) {
+            // free play
+            checks = mainApp.fs.getUnlocks(true);
+        } else {
+            // original game
+            checks = mainApp.fs.getUnlocks(false);
+        }
+        bioACheck.setSelected(checks[0]);
+        evoACheck.setSelected(checks[1]);
+        metACheck.setSelected(checks[2]);
+        evoBCheck.setSelected(checks[3]);
+        optACheck.setSelected(checks[4]);
+        evoCCheck.setSelected(checks[5]);
+        bioBCheck.setSelected(checks[6]);
+        metBCheck.setSelected(checks[7]);
+        optBCheck.setSelected(checks[8]);
+        geoACheck.setSelected(checks[9]);
+        evoDCheck.setSelected(checks[10]);
     }
 
     @FXML
@@ -141,6 +194,30 @@ public class FirstForm {
         rankingTable.getColumns().add(column("Difficulty", ScoreRow::getDifficulty));
         rankingTable.getColumns().add(column("Offset", ScoreRow::getOffset));
     }
+
+    @FXML
+    private void resetButton() {
+        mainApp.fs.ResetGame(freeRad.isSelected());
+        update(mainApp.fs);
+        onGameModeChanged();
+    }
+
+    @FXML
+    private void updateChecks() {
+        mainApp.fs.WriteUnlock(freeRad.isSelected(), 0, bioACheck.isSelected());
+        mainApp.fs.WriteUnlock(freeRad.isSelected(), 1, evoACheck.isSelected());
+        mainApp.fs.WriteUnlock(freeRad.isSelected(), 2, metACheck.isSelected());
+        mainApp.fs.WriteUnlock(freeRad.isSelected(), 3, evoBCheck.isSelected());
+        mainApp.fs.WriteUnlock(freeRad.isSelected(), 4, optACheck.isSelected());
+        mainApp.fs.WriteUnlock(freeRad.isSelected(), 5, evoCCheck.isSelected());
+        mainApp.fs.WriteUnlock(freeRad.isSelected(), 6, bioBCheck.isSelected());
+        mainApp.fs.WriteUnlock(freeRad.isSelected(), 7, metBCheck.isSelected());
+        mainApp.fs.WriteUnlock(freeRad.isSelected(), 8, optBCheck.isSelected());
+        mainApp.fs.WriteUnlock(freeRad.isSelected(), 9, geoACheck.isSelected());
+        mainApp.fs.WriteUnlock(freeRad.isSelected(), 10, evoDCheck.isSelected());
+        update(mainApp.fs);
+    }
+
     private static <S,T> TableColumn<S,T> column(String title, Function<S,T> property) {
         TableColumn<S,T> col = new TableColumn<>(title);
         col.setCellValueFactory(cellData -> new ObservableValueBase<T>() {

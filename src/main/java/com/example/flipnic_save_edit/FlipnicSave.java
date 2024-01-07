@@ -229,4 +229,33 @@ public class FlipnicSave {
     public String getRightNudge() {
         return DecodeInput(ReadByte(0x17));
     }
+
+    public boolean[] getUnlocks(boolean isFreePlay) {
+        boolean[] unlocks = new boolean[11];
+        byte[] unlockBytes;
+        if (!isFreePlay) {
+            unlockBytes = ReadBytes(0x274C, 11);
+        } else {
+            unlockBytes = ReadBytes(0x275C, 11);
+        }
+        for (int i = 0; i < unlockBytes.length; i++) {
+            unlocks[i] = unlockBytes[i] == 0x03;
+        }
+        return unlocks;
+    }
+
+    public void ResetGame(boolean isFreePlay) {
+        int offset = 0x274C;
+        if (isFreePlay) { offset+=0x10; }
+        for (int i = offset; i < offset + 0x10; i++) {
+            WriteByte(i, (byte) 0x00);
+        }
+    }
+
+    public void WriteUnlock(boolean isFreePlay, int idx, boolean unlocked) {
+        int offset = 0x274C;
+        if (isFreePlay) { offset += 0x10; }
+        offset += idx;
+        WriteByte(offset , (byte)(unlocked?0x03:0x00));
+    }
 }

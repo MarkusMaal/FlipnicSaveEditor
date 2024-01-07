@@ -194,6 +194,32 @@
                      </children></AnchorPane>
               </content>
           </Tab>
+
+          <Tab text="Unlocks">
+            <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <RadioButton fx:id="originalRad" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#onGameModeChanged" selected="true" text="Original game" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
+                        <RadioButton fx:id="freeRad" layoutX="130.0" layoutY="14.0" mnemonicParsing="false" onAction="#onGameModeChanged" text="Free play" AnchorPane.leftAnchor="120.0" AnchorPane.topAnchor="10.0" />
+                        <FlowPane hgap="10.0" layoutX="14.0" layoutY="49.0" prefHeight="314.0" prefWidth="580.0" vgap="10.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="50.0">
+                           <children>
+                              <CheckBox fx:id="bioACheck" mnemonicParsing="false" onAction="#updateChecks" text="Biology A" />
+                              <CheckBox fx:id="bioBCheck" mnemonicParsing="false" onAction="#updateChecks" text="Biology B" />
+                              <CheckBox fx:id="metACheck" mnemonicParsing="false" onAction="#updateChecks" text="Metallurgy A" />
+                              <CheckBox fx:id="metBCheck" mnemonicParsing="false" onAction="#updateChecks" text="Metallurgy B" />
+                              <CheckBox fx:id="optACheck" mnemonicParsing="false" onAction="#updateChecks" text="Optics A" />
+                              <CheckBox fx:id="optBCheck" mnemonicParsing="false" onAction="#updateChecks" text="Optics B" />
+                              <CheckBox fx:id="geoACheck" mnemonicParsing="false" onAction="#updateChecks" text="Geometry A" />
+                              <CheckBox fx:id="evoACheck" mnemonicParsing="false" onAction="#updateChecks" text="Evolution A" />
+                              <CheckBox fx:id="evoBCheck" mnemonicParsing="false" onAction="#updateChecks" text="Evolution B" />
+                              <CheckBox fx:id="evoCCheck" mnemonicParsing="false" onAction="#updateChecks" text="Evolution C" />
+                              <CheckBox fx:id="evoDCheck" mnemonicParsing="false" onAction="#updateChecks" text="Evolution D" />
+                           </children>
+                        </FlowPane>
+                        <Button layoutX="534.0" layoutY="6.0" mnemonicParsing="false" onAction="#resetButton" text="Reset" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
+                     </children></AnchorPane>
+            </content>
+          </Tab>
         </tabs>
       </TabPane>
 
