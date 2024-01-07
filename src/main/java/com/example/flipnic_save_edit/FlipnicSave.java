@@ -80,6 +80,37 @@ public class FlipnicSave {
         return digit;
     }
 
+    private String DecodeInput(byte input) {
+        switch (input) {
+            case 0x0F:
+                return "DPad Left";
+            case 0x0E:
+                return "DPad Down";
+            case 0x0D:
+                return "DPad Right";
+            case 0x0C:
+                return "DPad Up";
+            case 0x07:
+                return "Square";
+            case 0x06:
+                return "Cross";
+            case 0x05:
+                return "Circle";
+            case 0x04:
+                return "Triangle";
+            case 0x03:
+                return "R1";
+            case 0x02:
+                return "L1";
+            case 0x01:
+                return "R2";
+            case 0x00:
+                return "L2";
+            default:
+                return "Unknown";
+        }
+    }
+
     // general methods with abstraction layer
     public String GetChecksum() {
         byte[] rawChecksum = ReadBytes(0x8, 0x8);
@@ -160,5 +191,42 @@ public class FlipnicSave {
                 break;
         }
         return ((rank) + ";" + initials + ";" + scoreVal + ";" + combos + ";" + offset + ";" + difficulty + ";" + gameModes[modeIdx]).split(";", 0);
+    }
+
+    // options
+    public String getSoundMode() {
+        byte soundMode = ReadByte(0x10);
+        if (soundMode == 0x00) {
+            return "Mono";
+        } else {
+            return "Stereo";
+        }
+    }
+    public int getVolumeSfx() {
+        return ReadByte(0x11);
+    }
+    public int getVolumeBgm() {
+        return ReadByte(0x12);
+    }
+
+    // true = on
+    // false = off
+    public boolean getVibration() {
+        return ReadByte(0x13) == 0x00;
+    }
+
+
+
+    public String getLeftFlipper() {
+        return DecodeInput(ReadByte(0x23));
+    }
+    public String getRightFlipper() {
+        return DecodeInput(ReadByte(0x19));
+    }
+    public String getLeftNudge() {
+        return DecodeInput(ReadByte(0x16));
+    }
+    public String getRightNudge() {
+        return DecodeInput(ReadByte(0x17));
     }
 }

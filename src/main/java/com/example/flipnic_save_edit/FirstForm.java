@@ -17,19 +17,42 @@ import java.util.List;
 import java.util.function.Function;
 
 public class FirstForm {
+
+    // information
     @FXML
     private Label checkSumLabel;
+
+    @FXML
+    private Label currentScoreLabel;
+
+    @FXML
+    private Label currentStageLabel;
+
+    // options
+    @FXML
+    private Label bgmVolumeLabel;
+    @FXML
+    private Label sfxVolumeLabel;
+    @FXML
+    private Label soundModeLabel;
+    @FXML
+    private Label vibrationLabel;
+    @FXML
+    private Label leftFlipperLabel;
+    @FXML
+    private Label rightFlipperLabel;
+    @FXML
+    private Label leftNudgeLabel;
+    @FXML
+    private Label rightNudgeLabel;
+
+    // ranking
 
     @FXML
     private ComboBox<String> gameModeSelector;
 
     @FXML
     private TableView<ScoreRow> rankingTable;
-    @FXML
-    private Label currentScoreLabel;
-
-    @FXML
-    private Label currentStageLabel;
 
     @FXML
     private TableColumn<ScoreRow, String> rankColumn;
@@ -66,13 +89,35 @@ public class FirstForm {
 
     public void update(FlipnicSave fs) {
         if (fs.isLoaded()) {
+            // information
             checkSumLabel.setText(fs.GetChecksum());
             currentScoreLabel.setText(String.valueOf(fs.GetCurrentScore()));
             currentStageLabel.setText(fs.GetCurrentStage());
+            // options
+            bgmVolumeLabel.setText(String.valueOf(fs.getVolumeBgm()));
+            sfxVolumeLabel.setText(String.valueOf(fs.getVolumeSfx()));
+            soundModeLabel.setText(fs.getSoundMode());
+            vibrationLabel.setText(fs.getVibration()?"On":"Off");
+            // inputs
+            leftNudgeLabel.setText(fs.getLeftNudge());
+            rightNudgeLabel.setText(fs.getRightNudge());
+            leftFlipperLabel.setText(fs.getLeftFlipper());
+            rightFlipperLabel.setText(fs.getRightFlipper());
         } else {
+            // information
             checkSumLabel.setText("Not loaded");
             currentScoreLabel.setText("0");
             currentStageLabel.setText("Biology A");
+            // options
+            bgmVolumeLabel.setText("0");
+            sfxVolumeLabel.setText("0");
+            soundModeLabel.setText("Mono");
+            vibrationLabel.setText("On");
+            // inputs
+            leftNudgeLabel.setText("L2");
+            rightNudgeLabel.setText("L2");
+            leftFlipperLabel.setText("L2");
+            rightFlipperLabel.setText("L2");
         }
     }
 
