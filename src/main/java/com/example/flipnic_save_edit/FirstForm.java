@@ -29,6 +29,9 @@ public class FirstForm {
     private Label currentScoreLabel;
 
     @FXML
+    private Label currentStageLabel;
+
+    @FXML
     private TableColumn<ScoreRow, String> rankColumn;
 
     @FXML
@@ -65,9 +68,11 @@ public class FirstForm {
         if (fs.isLoaded()) {
             checkSumLabel.setText(fs.GetChecksum());
             currentScoreLabel.setText(String.valueOf(fs.GetCurrentScore()));
+            currentStageLabel.setText(fs.GetCurrentStage());
         } else {
             checkSumLabel.setText("Not loaded");
             currentScoreLabel.setText("0");
+            currentStageLabel.setText("Biology A");
         }
     }
 

@@ -12,6 +12,10 @@ public class FlipnicSave {
     // declarations
     private final List<Byte> dataList = new ArrayList<>();
 
+    private final String[] gameModes = {"Original game", "Biology A", "Biology B", "Metallurgy A", "Metallurgy B", "Optics A", "Optics B", "Geometry A",
+            "Biology A (Time Attack)", "Biology B (Time Attack)", "Metallurgy A (Time Attack)", "Metallurgy B (Time Attack)", "Optics A (Time Attack)", "Optics B (Time Attack)", "Geometry A (Time Attack)"};
+    private final String[] originalModes = {"Biology A", "Evolution A", "Metallurgy A", "Evolution B", "Optics A", "Evolution C", "Biology B", "Metallurgy B", "Optics B", "Geometry A", "Evolution D", "All stages finished"};
+
     // primary constructor
     public FlipnicSave(byte[] data) {
         for (byte b : data) {
@@ -113,6 +117,16 @@ public class FlipnicSave {
         return ByteBuffer.wrap(scoreData).getInt();
     }
 
+    public String GetCurrentStage() {
+        byte[] stageIdBytes = this.ReadBytesLE(0x10C8, 0x4);
+        int stageId = ByteBuffer.wrap(stageIdBytes).getInt();
+        if (stageId < originalModes.length) {
+            return originalModes[stageId];
+        } else {
+            return "Out of range";
+        }
+    }
+
     public String[] GetScore(int idx) {
         if (!isLoaded()) {
             return new String[0];
@@ -121,8 +135,6 @@ public class FlipnicSave {
         byte[] scoreData = ReadBytes(offset, 0x38);
         byte[] scoreValBytes = { scoreData[3], scoreData[2], scoreData[1], scoreData[0] };
         int scoreVal = ByteBuffer.wrap(scoreValBytes).getInt();
-        String[] gameModes = {"Original game", "Biology A", "Biology B", "Metallurgy A", "Metallurgy B", "Optics A", "Optics B", "Geometry A",
-                              "Biology A (Time Attack)", "Biology B (Time Attack)", "Metallurgy A (Time Attack)", "Metallurgy B (Time Attack)", "Optics A (Time Attack)", "Optics B (Time Attack)", "Geometry A (Time Attack)"};
         int modeIdx = (idx - (idx % 5)) / 5;
         int rank = idx % 5;
         rank++;

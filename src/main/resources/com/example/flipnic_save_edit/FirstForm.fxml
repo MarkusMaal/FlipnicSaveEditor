@@ -53,6 +53,19 @@
                                  <Insets left="5.0" />
                               </GridPane.margin>
                            </Label>
+                           <Label alignment="CENTER_RIGHT" prefHeight="21.0" prefWidth="296.0" text="Current stage:" GridPane.rowIndex="2">
+                              <font>
+                                 <Font name="Calibri" size="17.0" />
+                              </font>
+                           </Label>
+                           <Label fx:id="currentStageLabel" text="Biology A" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                              <font>
+                                 <Font name="Calibri" size="17.0" />
+                              </font>
+                              <GridPane.margin>
+                                 <Insets left="5.0" />
+                              </GridPane.margin>
+                           </Label>
                       </children>
                   </GridPane>
               </AnchorPane>
