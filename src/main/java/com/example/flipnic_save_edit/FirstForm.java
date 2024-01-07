@@ -25,6 +25,8 @@ public class FirstForm {
 
     @FXML
     private TableView<ScoreRow> rankingTable;
+    @FXML
+    private Label currentScoreLabel;
 
     @FXML
     private TableColumn<ScoreRow, String> rankColumn;
@@ -37,6 +39,7 @@ public class FirstForm {
 
     @FXML
     private TableColumn<ScoreRow, String> combosColumn;
+
 
     private FlipnicSave fs;
 
@@ -61,8 +64,10 @@ public class FirstForm {
     public void update(FlipnicSave fs) {
         if (fs.isLoaded()) {
             checkSumLabel.setText(fs.GetChecksum());
+            currentScoreLabel.setText(String.valueOf(fs.GetCurrentScore()));
         } else {
             checkSumLabel.setText("Not loaded");
+            currentScoreLabel.setText("0");
         }
     }
 

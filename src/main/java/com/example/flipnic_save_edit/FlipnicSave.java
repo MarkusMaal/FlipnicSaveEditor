@@ -33,6 +33,15 @@ public class FlipnicSave {
         }
         return returnArray;
     }
+    private byte[] ReadBytesLE(int addr, int count) {
+        byte[] returnArray = new byte[count];
+        int j = 0;
+        for (int i = addr + count - 1; i >= addr; i--) {
+            returnArray[j] = this.dataList.get(i);
+            j++;
+        }
+        return returnArray;
+    }
 
     private void WriteByte(int addr, byte value) {
         dataList.set(addr, value);
@@ -97,6 +106,11 @@ public class FlipnicSave {
         byte[] reference = HexFormat.of().parseHex("3402cb0f43553624");
         byte[] actual = this.ReadBytes(0, 8);
         return Arrays.equals(reference, actual);
+    }
+
+    public int GetCurrentScore() {
+        byte[] scoreData = this.ReadBytesLE(0x28, 0x4);
+        return ByteBuffer.wrap(scoreData).getInt();
     }
 
     public String[] GetScore(int idx) {

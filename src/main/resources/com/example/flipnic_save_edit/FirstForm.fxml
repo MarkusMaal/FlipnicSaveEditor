@@ -40,6 +40,19 @@
                               <font>
                                   <Font name="Calibri" size="17.0" />
                               </font></Label>
+                           <Label alignment="CENTER_RIGHT" prefHeight="22.0" prefWidth="294.0" text="Current score:" GridPane.rowIndex="1">
+                              <font>
+                                 <Font name="Calibri" size="17.0" />
+                              </font>
+                           </Label>
+                           <Label fx:id="currentScoreLabel" prefHeight="21.0" prefWidth="297.0" text="0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                              <font>
+                                 <Font name="Calibri" size="17.0" />
+                              </font>
+                              <GridPane.margin>
+                                 <Insets left="5.0" />
+                              </GridPane.margin>
+                           </Label>
                       </children>
                   </GridPane>
               </AnchorPane>
