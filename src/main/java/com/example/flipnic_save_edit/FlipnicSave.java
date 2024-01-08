@@ -16,6 +16,24 @@ public class FlipnicSave {
             "Biology A (Time Attack)", "Biology B (Time Attack)", "Metallurgy A (Time Attack)", "Metallurgy B (Time Attack)", "Optics A (Time Attack)", "Optics B (Time Attack)", "Geometry A (Time Attack)"};
     private final String[] originalModes = {"Biology A", "Evolution A", "Metallurgy A", "Evolution B", "Optics A", "Evolution C", "Biology B", "Metallurgy B", "Optics B", "Geometry A", "Evolution D", "All stages finished"};
 
+    private final String[] validStrings = {"ja", "", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "BONUS %dpts", "JACKPOT=%d",
+            "IN", "%d", "?Go ?Back", "Yes", "No", "CONTINUE?", "RESULT", "FLAMINGO COUNTS", "FLAMINGO BONUS",
+            " % d Pts.", " ----- Pts.", "PERFECT BONUS", "TOTAL SCORE", "WHY DON'T YOU", "GET STARS ?", "YOU GET",
+            "ALL", "FLAMINGOS!", "%d/10", "COMBO %d", "SLOT CHANCE!", "%d Pts.", "ALIEN HILL !", "GALAXY TENNIS !",
+            "AREA 74 !", "SPACE WARP !", "100_BLOCKS !", "WARNING!", "BUMPER AREA", "NON STOP AREA", "AREA EXIT",
+            "CREDIT(S) %d", "NO BONUS", "EXP COUNTS %d", "POINTS × %d", "READY", "%dPts.", "DANGER!", "LEVEL %d",
+            "BINGO %d!¥n%ldpts.!¥n", "ANSWER", "GOOD!", "FLAMINGO BONUS", "BANANA BONUS", "BONUS", "BONUS", "REST BALL BONUS",
+            "PERFECT BONUS", "LEVEL BONUS", "PERFECT BONUS", "Pts.", "TOTAL SCORE", "GET ALL THE COLORS!", "GET FIVE RED COLORS!",
+            "YOU GOT A COLOR", "THIS IS NOT REQUIRED", "START", "EXIT", "KICK OFF", "TIP OFF", "READY", "READY", "GOAL!",
+            "%dP WINS", "DRAW", "ZERO GRAVITY", "MULTIBALL 1", "MULTIBALL 2", "MULTIBALL 3", "LANE COUNTS MISSION 1", "LANE COUNTS MISSION 2",
+            "LANE COUNTS MISSION 3", "TOTAL LANE COUNTS", "TOTAL BUMPER COUNTS", "EXTRA BALL", "EXTRA CREDIT", "FREEZE OVER", "HIDDEN PATH DISCOVERY",
+            "CIRCLE OF LIFE", "BUMPER VILLAGE", "PERFECT BUMPER VILLAGE", "LUCKY FLAMINGOS", "HUNGRY MONKEY", "COLOR PUZZLE", "MONEY MONEY MONEY",
+            "UFO QUIZ SHOW", "MOVE ON 1", "MOVE ON 2", "SPIDER CRAB SHOOT-DOWN", "STOP THE FOUR SHAFTS 1", "STOP THE FOUR SHAFTS 2", "UFO SHOOT-DOWN",
+            "CRAB BABY SHOOT-DOWN", "POINT OF NO RETURN 1", "POINT OF NO RETURN 2", "POINT OF NO RETURN 3", "LOOP THE LOOP 1", "LOOP THE LOOP 2",
+            "LOOP THE LOOP 3", "CHU CHU MULTIBALL", "SPACE WARP", "ALIEN HILL", "AREA 74", "GALAXY TENNIS", "100 BLOCKS", "WARM-COLORED BLOCKS"};
+
+    private final int[] missionOffsets = {0x114C, 0x124C, 0x134C, 0x144C, 0x14CC, 0x154C, 0x15CC};
+
     // primary constructor
     public FlipnicSave(byte[] data) {
         for (byte b : data) {
@@ -25,10 +43,18 @@ public class FlipnicSave {
 
     // internal methods
     private byte ReadByte(int addr) {
+        if (addr >= this.dataList.size()) {
+            System.out.println("Offset " + addr + " out of range!");
+            return 0x00;
+        }
         return dataList.get(addr);
     }
 
     private byte[] ReadBytes(int addr, int count) {
+        if (addr + count >= this.dataList.size()) {
+            System.out.println("Invalid range: " + addr + " to " + (addr+count));
+            return new byte[count];
+        }
         byte[] returnArray = new byte[count];
         int j = 0;
         for (int i = addr; i < addr + count; i++) {
@@ -38,6 +64,10 @@ public class FlipnicSave {
         return returnArray;
     }
     private byte[] ReadBytesLE(int addr, int count) {
+        if (addr + count >= this.dataList.size()) {
+            System.out.println("Invalid range: " + addr + " to " + (addr+count));
+            return new byte[count];
+        }
         byte[] returnArray = new byte[count];
         int j = 0;
         for (int i = addr + count - 1; i >= addr; i--) {
@@ -48,6 +78,10 @@ public class FlipnicSave {
     }
 
     private void WriteByte(int addr, byte value) {
+        if (addr >= this.dataList.size()) {
+            System.out.println("Offset " + addr + " out of range!");
+            return;
+        }
         dataList.set(addr, value);
     }
 
@@ -111,6 +145,16 @@ public class FlipnicSave {
         }
     }
 
+    private String DecodeString(byte idx) {
+        if (idx >= this.validStrings.length) {
+            return "(null)";
+        } else if (idx >= 0) {
+            return this.validStrings[idx];
+        } else {
+            return "(null)";
+        }
+    }
+
     // general methods with abstraction layer
     public String GetChecksum() {
         byte[] rawChecksum = ReadBytes(0x8, 0x8);
@@ -151,7 +195,7 @@ public class FlipnicSave {
     public String GetCurrentStage() {
         byte[] stageIdBytes = this.ReadBytesLE(0x10C8, 0x4);
         int stageId = ByteBuffer.wrap(stageIdBytes).getInt();
-        if (stageId < originalModes.length) {
+        if ((stageId < originalModes.length) && (stageId >= 0)) {
             return originalModes[stageId];
         } else {
             return "Out of range";
@@ -257,5 +301,63 @@ public class FlipnicSave {
         if (isFreePlay) { offset += 0x10; }
         offset += idx;
         WriteByte(offset , (byte)(unlocked?0x03:0x00));
+    }
+
+
+    public String[] GetMissions(int idx) {
+        try {
+            if (0x114C + (idx * 0x80) >= this.dataList.size()) {
+                return new String[0];
+            } else {
+                int offset = 0x114C + (idx * 0x80);
+                ArrayList<String> missions = new ArrayList<>();
+                String decodedString = "";
+
+                while (offset < 0x114C + (idx * 0x80) + 0x80) {
+                    try {
+                        decodedString = DecodeString(ReadByte(offset));
+                        if (!decodedString.equals("ja")) {
+                            missions.add(decodedString);
+                        }
+                        offset += 4;
+                    } catch (Exception ex) {
+                        missions.add("Bad mission");
+                        offset += 4;
+                    }
+                }
+                return missions.toArray(new String[0]);
+            }
+        } catch (Exception ex) {
+            String[] error = {"Corrupted data"};
+            return error;
+        }
+    }
+
+    public String[] GetStageStatus(int idx) {
+        if (0x214C + (idx * 0x20) >= this.dataList.size()) {
+            return new String[0];
+        } else {
+            int offset = 0x214C + (idx * 0x20);
+            ArrayList<String> status = new ArrayList<>();
+            for (int x = offset; x < offset + 0x20; x++) {
+                switch (ReadByte(x))
+                {
+                    case 0x0:
+                        status.add("Not completed");
+                        break;
+                    case 0x1:
+                        status.add("Started");
+                        break;
+                    case 0x2:
+                    case 0x3:
+                        status.add("Completed");
+                        break;
+                    default:
+                        status.add("Invalid");
+                        break;
+                }
+            }
+            return status.toArray(new String[0]);
+        }
     }
 }

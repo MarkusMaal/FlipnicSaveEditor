@@ -93,17 +93,27 @@ public class FirstForm {
     @FXML
     private CheckBox evoDCheck;
 
+    // missions
+    @FXML
+    private ComboBox missionsComboBox;
+    @FXML
+    private Label missionsLabel;
+    @FXML
+    private TableView stageStatusTable;
 
     private FlipnicSave fs;
 
     private String[] gameModes = {"Original game", "Biology A", "Biology B", "Metallurgy A", "Metallurgy B", "Optics A", "Optics B", "Geometry A",
             "Biology A (Time Attack)", "Biology B (Time Attack)", "Metallurgy A (Time Attack)", "Metallurgy B (Time Attack)", "Optics A (Time Attack)", "Optics B (Time Attack)", "Geometry A (Time Attack)"};
-
+    private String[] stages = {"Biology A", "Evolution A", "Metallurgy A", "Evolution B", "Optics A", "Evolution C", "Biology B", "Metallurgy B", "Optics B", "Geometry A", "Evolution D"};
+    private ArrayList<String[]> missions = new ArrayList<>();
 
     @FXML
     private void initialize() {
         List<String> strings = new ArrayList<>(Arrays.asList(this.gameModes));
         gameModeSelector.setItems(FXCollections.observableList(strings));
+        strings = new ArrayList<>(Arrays.asList(this.stages));
+        missionsComboBox.setItems(FXCollections.observableList(strings));
         freeRad.setToggleGroup(grp);
         originalRad.setToggleGroup(grp);
     }
@@ -114,6 +124,13 @@ public class FirstForm {
         this.mainApp = mainApp;
         this.fs = mainApp.fs;
         update(this.fs);
+    }
+
+    private void updateMissions() {
+        this.missions = new ArrayList<>();
+        for (int i = 0; i < 11; i++) {
+            this.missions.add(mainApp.fs.GetMissions(i));
+        }
     }
 
     public void update(FlipnicSave fs) {
@@ -133,6 +150,8 @@ public class FirstForm {
             leftFlipperLabel.setText(fs.getLeftFlipper());
             rightFlipperLabel.setText(fs.getRightFlipper());
             onGameModeChanged();
+            // missions
+            updateMissions();
         } else {
             // information
             checkSumLabel.setText("Not loaded");
@@ -148,6 +167,36 @@ public class FirstForm {
             rightNudgeLabel.setText("L2");
             leftFlipperLabel.setText("L2");
             rightFlipperLabel.setText("L2");
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    @FXML
+    private void onMissionStageChanged() {
+        if (mainApp.fs.isLoaded()) {
+            stageStatusTable.getItems().clear();
+            stageStatusTable.getColumns().clear();
+            MModel model = new MModel();
+            int statusIdx = missionsComboBox.getSelectionModel().getSelectedIndex();
+            String[] status = mainApp.fs.GetStageStatus(statusIdx);
+            int i = 0;
+            if (missions.isEmpty()) {
+                return;
+            }
+            for (String mission: this.missions.get(statusIdx)) {
+                if (i < status.length) {
+                    model.getItems().add(new Mission(mission, status[i]));
+                } else {
+                    model.getItems().add(new Mission(mission, "Out of range"));
+                }
+                i++;
+            }
+            stageStatusTable.setItems(FXCollections.observableList(model.getItems()));
+            stageStatusTable.getColumns().add(column("Mission", Mission::getName));
+            stageStatusTable.getColumns().add(column("Status", Mission::getStatus));
+        } else {
+            stageStatusTable.getItems().clear();
+            stageStatusTable.getColumns().clear();
         }
     }
 
@@ -239,6 +288,36 @@ public class FirstForm {
             return items ;
         }
     }
+    public static class MModel {
+        private List<Mission> items ;
+
+        public MModel() {
+            this.items = new ArrayList<>();
+        }
+
+        public List<Mission> getItems() {
+            return items ;
+        }
+    }
+
+    private static class Mission {
+        private final String name;
+        private final String status;
+
+        private Mission(String name, String status) {
+            this.name = name;
+            this.status = status;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getStatus() {
+            return status;
+        }
+    }
+
     private static class ScoreRow {
         private final String rank;
         private final String initials;

@@ -25,7 +25,7 @@ public class MainApp extends Application {
     public FlipnicSave fs = new FlipnicSave(new byte[0]);
     public FirstForm mainWindow;
 
-    public String version = "0.2";
+    public String version = "0.3";
 
 
     @Override
@@ -74,7 +74,7 @@ public class MainApp extends Application {
         try {
             Path path = saveFile.toPath();
             long size = Files.size(path);
-            if (size > 0x10000) {
+            if (size > 1048576) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("File size error");
                 alert.setHeaderText("File is too big");
@@ -92,18 +92,24 @@ public class MainApp extends Application {
                 alert.showAndWait();
             }
             primaryStage.setTitle("Flipnic Save Editor " + this.version + " - " + saveFile.getName());
+            int totalMissions = 0;
+            for (int i = 0; i < 11; i++) {
+                totalMissions += this.fs.GetMissions(i).length;
+            }
+            if (totalMissions != 115) {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Stage status invalid");
+                alert.setHeaderText("Mission data may be corrupted");
+                alert.setContentText("Abnormal amount of missions detected: expected 115, actual " + totalMissions + "\nThis save file may be modified");
+                alert.showAndWait();
+            }
             mainWindow.update(this.fs);
+
         } catch (IOException ie) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("IOException");
             alert.setHeaderText("Runtime error has occurred");
             alert.setContentText(ie.getMessage());
-            alert.showAndWait();
-        } catch (Exception e) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("General load error");
-            alert.setHeaderText("Runtime error has occurred");
-            alert.setContentText(e.getMessage());
             alert.showAndWait();
         }
     }
