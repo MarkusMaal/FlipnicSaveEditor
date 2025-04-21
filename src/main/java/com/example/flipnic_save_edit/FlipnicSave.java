@@ -4,7 +4,10 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.CharBuffer;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
@@ -33,8 +36,28 @@ public class FlipnicSave {
             "UFO QUIZ SHOW", "MOVE ON 1", "MOVE ON 2", "SPIDER CRAB SHOOT-DOWN", "STOP THE FOUR SHAFTS 1", "STOP THE FOUR SHAFTS 2", "UFO SHOOT-DOWN",
             "CRAB BABY SHOOT-DOWN", "POINT OF NO RETURN 1", "POINT OF NO RETURN 2", "POINT OF NO RETURN 3", "LOOP THE LOOP 1", "LOOP THE LOOP 2",
             "LOOP THE LOOP 3", "CHU CHU MULTIBALL", "SPACE WARP", "ALIEN HILL", "AREA 74", "GALAXY TENNIS", "100 BLOCKS", "WARM-COLORED BLOCKS"};
-
+    private static String[] inputs = {"L2", "R2", "L1", "R1", "Triangle", "Circle", "Cross", "Square", "Unknown 8", "Unknown 9", "Unknown A", "Unknown B", "DPad Up", "DPad Right", "DPad Down", "DPad Left"};
     private final int[] missionOffsets = {0x114C, 0x124C, 0x134C, 0x144C, 0x14CC, 0x154C, 0x15CC};
+
+    public enum Options {
+        SOUND_MODE,
+        SFX_VOLUME,
+        BGM_VOLUME,
+        VIBRATION
+    }
+
+    public enum Control {
+        LEFT_NUDGE,
+        LEFT_FLIPPER,
+        RIGHT_NUDGE,
+        RIGHT_FLIPPER
+    }
+
+    public enum Difficulty {
+        EASY,
+        NORMAL,
+        HARD
+    }
 
     // primary constructor
     public FlipnicSave(byte[] data) {
@@ -49,10 +72,6 @@ public class FlipnicSave {
                 fos.write(b);
             }
         }
-    }
-
-    public String[] GetStrings() {
-        return this.validStrings;
     }
 
     // internal methods
@@ -129,33 +148,10 @@ public class FlipnicSave {
     }
 
     private String DecodeInput(byte input) {
-        switch (input) {
-            case 0x0F:
-                return "DPad Left";
-            case 0x0E:
-                return "DPad Down";
-            case 0x0D:
-                return "DPad Right";
-            case 0x0C:
-                return "DPad Up";
-            case 0x07:
-                return "Square";
-            case 0x06:
-                return "Cross";
-            case 0x05:
-                return "Circle";
-            case 0x04:
-                return "Triangle";
-            case 0x03:
-                return "R1";
-            case 0x02:
-                return "L1";
-            case 0x01:
-                return "R2";
-            case 0x00:
-                return "L2";
-            default:
-                return "Unknown";
+        if (input < inputs.length) {
+            return inputs[input];
+        } else {
+            return "Unknown";
         }
     }
 
@@ -169,6 +165,16 @@ public class FlipnicSave {
         }
     }
 
+
+    // general methods with abstraction layer
+
+    public String[] GetStrings() {
+        return this.validStrings;
+    }
+
+    public static String[] GetAllInputs() {
+        return inputs;
+    }
     // calculates the first checksum, found at offsets 0x8-0xb
     public byte[] CalcChecksum1() {
         byte[] gameData = ReadBytes(0xc, this.dataList.size() - 0xc);
@@ -195,7 +201,6 @@ public class FlipnicSave {
         return Arrays.equals(ReadBytes(secondary ? 0xc : 0x8, 0x4), secondary ? CalcChecksum2() : CalcChecksum1());
     }
 
-    // general methods with abstraction layer
     public String GetChecksum(boolean secondary) {
         byte[] rawChecksum = ReadBytes(secondary ? 0xc : 0x8, 0x4);
         byte[] onlineChecksum = secondary ? CalcChecksum2() : CalcChecksum1();
@@ -249,6 +254,38 @@ public class FlipnicSave {
             return originalModes[stageId];
         } else {
             return "Out of range";
+        }
+    }
+
+    public void SetScore(int mode, int idx, int score, String initials, int combos, Difficulty difficulty) {
+        if (!isLoaded()) {
+            return;
+        }
+        int offset = 0x60+((5*mode+idx) * 0x38);
+        byte[] scoreData = ReadBytes(offset, 0x38);
+        ByteBuffer b = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(score);
+        ByteBuffer comboBuffer = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(combos);
+        ByteBuffer diffBuffer = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(difficulty.ordinal());
+        CharBuffer chr = CharBuffer.wrap(initials);
+        ByteBuffer cb = StandardCharsets.UTF_8.encode(chr);
+        byte[] inb = Arrays.copyOfRange(cb.array(), cb.position(), cb.limit());
+        scoreData[0] = b.array()[0];
+        scoreData[1] = b.array()[1];
+        scoreData[2] = b.array()[2];
+        scoreData[3] = b.array()[3];
+        scoreData[0x10] = inb[0];
+        scoreData[0x11] = inb[1];
+        scoreData[0x12] = inb[2];
+        scoreData[0x8] = diffBuffer.array()[0];
+        scoreData[0x9] = diffBuffer.array()[1];
+        scoreData[0xa] = diffBuffer.array()[2];
+        scoreData[0xb] = diffBuffer.array()[3];
+        scoreData[0xc] = comboBuffer.array()[0];
+        scoreData[0xd] = comboBuffer.array()[1];
+        scoreData[0xe] = comboBuffer.array()[2];
+        scoreData[0xf] = comboBuffer.array()[3];
+        for (int i = offset; i < offset + scoreData.length; i++) {
+            WriteByte(i, scoreData[i - offset]);
         }
     }
 
@@ -309,6 +346,10 @@ public class FlipnicSave {
         return ReadByte(0x13) == 0x00;
     }
 
+    public void SetOption(Options idx, byte value) {
+        WriteByte(0x10+idx.ordinal(), value);
+    }
+
 
 
     public String getLeftFlipper() {
@@ -322,6 +363,18 @@ public class FlipnicSave {
     }
     public String getRightNudge() {
         return DecodeInput(ReadByte(0x17));
+    }
+
+    public void SetControl(FlipnicSave.Control control, byte value) {
+        if (!isLoaded()) return;
+        int offset = 0x16;
+        offset += control.ordinal();
+        if (control == Control.LEFT_FLIPPER) {
+            offset = 0x23;
+        } else if (control == Control.RIGHT_FLIPPER) {
+            offset = 0x19;
+        }
+        WriteByte(offset, value);
     }
 
     public boolean[] getUnlocks(boolean isFreePlay) {

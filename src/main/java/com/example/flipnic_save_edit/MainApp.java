@@ -25,7 +25,7 @@ public class MainApp extends Application {
     public FlipnicSave fs = new FlipnicSave(new byte[0]);
     public FirstForm mainWindow;
 
-    public String version = "0.4";
+    public String version = "0.5";
     public String savePath = "";
 
 

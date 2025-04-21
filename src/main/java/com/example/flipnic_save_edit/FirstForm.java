@@ -33,21 +33,21 @@ public class FirstForm {
 
     // options
     @FXML
-    private Label bgmVolumeLabel;
+    private ComboBox<String> bgmVolumeLabel;
     @FXML
-    private Label sfxVolumeLabel;
+    private ComboBox<String> sfxVolumeLabel;
     @FXML
-    private Label soundModeLabel;
+    private ComboBox<String> soundModeLabel;
     @FXML
-    private Label vibrationLabel;
+    private CheckBox vibrationLabel;
     @FXML
-    private Label leftFlipperLabel;
+    private ComboBox<String> leftFlipperLabel;
     @FXML
-    private Label rightFlipperLabel;
+    private ComboBox<String> rightFlipperLabel;
     @FXML
-    private Label leftNudgeLabel;
+    private ComboBox<String> leftNudgeLabel;
     @FXML
-    private Label rightNudgeLabel;
+    private ComboBox<String> rightNudgeLabel;
 
     // ranking
 
@@ -114,14 +114,28 @@ public class FirstForm {
     private String[] gameModes = {"Original game", "Biology A", "Biology B", "Metallurgy A", "Metallurgy B", "Optics A", "Optics B", "Geometry A",
             "Biology A (Time Attack)", "Biology B (Time Attack)", "Metallurgy A (Time Attack)", "Metallurgy B (Time Attack)", "Optics A (Time Attack)", "Optics B (Time Attack)", "Geometry A (Time Attack)"};
     private String[] stages = {"Biology A", "Evolution A", "Metallurgy A", "Evolution B", "Optics A", "Evolution C", "Biology B", "Metallurgy B", "Optics B", "Geometry A", "Evolution D"};
+    private String[] soundModes = {"Mono", "Stereo"};
     private ArrayList<String[]> missions = new ArrayList<>();
+    boolean locked = false;
 
     @FXML
     private void initialize() {
+        List<String> numbers = new ArrayList<>();
         List<String> strings = new ArrayList<>(Arrays.asList(this.gameModes));
+        for (int i = 0; i < 255; i++) {
+            numbers.add(String.valueOf(i));
+        }
         gameModeSelector.setItems(FXCollections.observableList(strings));
         strings = new ArrayList<>(Arrays.asList(this.stages));
+
         missionsComboBox.setItems(FXCollections.observableList(strings));
+        bgmVolumeLabel.setItems(FXCollections.observableList(numbers));
+        sfxVolumeLabel.setItems(FXCollections.observableList(numbers));
+        soundModeLabel.setItems(FXCollections.observableList(List.of(soundModes)));
+        leftNudgeLabel.setItems(FXCollections.observableList(List.of(FlipnicSave.GetAllInputs())));
+        leftFlipperLabel.setItems(FXCollections.observableList(List.of(FlipnicSave.GetAllInputs())));
+        rightNudgeLabel.setItems(FXCollections.observableList(List.of(FlipnicSave.GetAllInputs())));
+        rightFlipperLabel.setItems(FXCollections.observableList(List.of(FlipnicSave.GetAllInputs())));
         freeRad.setToggleGroup(grp);
         originalRad.setToggleGroup(grp);
     }
@@ -142,6 +156,7 @@ public class FirstForm {
     }
 
     public void update(FlipnicSave fs) {
+        locked = true;
         if (fs.isLoaded()) {
             // information
             redundantChecksumLabel.setText(fs.GetChecksum(false) + " (" + (fs.ConfirmChecksums(false) ? "Valid" : "Invalid") + ")");
@@ -149,15 +164,15 @@ public class FirstForm {
             currentScoreLabel.setText(String.valueOf(fs.GetCurrentScore()));
             currentStageLabel.setText(fs.GetCurrentStage());
             // options
-            bgmVolumeLabel.setText(String.valueOf(fs.getVolumeBgm()));
-            sfxVolumeLabel.setText(String.valueOf(fs.getVolumeSfx()));
-            soundModeLabel.setText(fs.getSoundMode());
-            vibrationLabel.setText(fs.getVibration()?"On":"Off");
+            sfxVolumeLabel.getSelectionModel().select(fs.getVolumeSfx());
+            bgmVolumeLabel.getSelectionModel().select(fs.getVolumeBgm());
+            soundModeLabel.getSelectionModel().select(fs.getSoundMode().equals("Mono") ? 0 : 1);
+            vibrationLabel.setSelected(fs.getVibration());
             // inputs
-            leftNudgeLabel.setText(fs.getLeftNudge());
-            rightNudgeLabel.setText(fs.getRightNudge());
-            leftFlipperLabel.setText(fs.getLeftFlipper());
-            rightFlipperLabel.setText(fs.getRightFlipper());
+            leftNudgeLabel.getSelectionModel().select(fs.getLeftNudge());
+            rightNudgeLabel.getSelectionModel().select(fs.getRightNudge());
+            leftFlipperLabel.getSelectionModel().select(fs.getLeftFlipper());
+            rightFlipperLabel.getSelectionModel().select(fs.getRightFlipper());
             onGameModeChanged();
             // missions
             updateMissions();
@@ -167,16 +182,17 @@ public class FirstForm {
             currentScoreLabel.setText("0");
             currentStageLabel.setText("Biology A");
             // options
-            bgmVolumeLabel.setText("0");
-            sfxVolumeLabel.setText("0");
-            soundModeLabel.setText("Mono");
-            vibrationLabel.setText("On");
+            bgmVolumeLabel.getSelectionModel().select(0);
+            sfxVolumeLabel.getSelectionModel().select(0);
+            soundModeLabel.getSelectionModel().select(0);
+            vibrationLabel.setSelected(false);
             // inputs
-            leftNudgeLabel.setText("L2");
-            rightNudgeLabel.setText("L2");
-            leftFlipperLabel.setText("L2");
-            rightFlipperLabel.setText("L2");
+            leftNudgeLabel.getSelectionModel().select(0);
+            rightNudgeLabel.getSelectionModel().select(0);
+            leftFlipperLabel.getSelectionModel().select(0);
+            rightFlipperLabel.getSelectionModel().select(0);
         }
+        locked = false;
     }
 
     @SuppressWarnings("unchecked")
@@ -273,6 +289,10 @@ public class FirstForm {
             else if (i != 0) {
                 tc.setCellFactory(TextFieldTableCell.forTableColumn());
             }
+            tc.setOnEditCommit(event -> {
+                ScoreRow sr = ((TableColumn.CellEditEvent<ScoreRow, ?>)event).getTableView().getItems().get(((TableColumn.CellEditEvent<ScoreRow, ?>)event).getTablePosition().getRow());
+                sr.setColumn(((TableColumn.CellEditEvent<ScoreRow, ?>) event).getTableColumn().getText(), ((TableColumn.CellEditEvent<ScoreRow, ?>) event).getNewValue().toString());
+            });
             i++;
         }
         rankingTable.editableProperty().set(true);
@@ -306,6 +326,20 @@ public class FirstForm {
         mainApp.fs.WriteUnlock(freeRad.isSelected(), 9, geoACheck.isSelected());
         mainApp.fs.WriteUnlock(freeRad.isSelected(), 10, evoDCheck.isSelected());
         mainApp.fs.WriteUnlock(freeRad.isSelected(), 11, creditsCheck.isSelected());
+        update(mainApp.fs);
+    }
+
+    @FXML
+    private void updateSettings() {
+        if (locked) return; // prevent weird race conditions
+        mainApp.fs.SetOption(FlipnicSave.Options.SOUND_MODE, (byte) ((soundModeLabel.getSelectionModel().getSelectedIndex() == 0) ? 0 : 1));
+        mainApp.fs.SetOption(FlipnicSave.Options.SFX_VOLUME, (byte) (sfxVolumeLabel.getSelectionModel().getSelectedIndex()));
+        mainApp.fs.SetOption(FlipnicSave.Options.BGM_VOLUME, (byte) (bgmVolumeLabel.getSelectionModel().getSelectedIndex()));
+        mainApp.fs.SetOption(FlipnicSave.Options.VIBRATION, (byte) (vibrationLabel.isSelected() ? 0 : 1));
+        mainApp.fs.SetControl(FlipnicSave.Control.LEFT_NUDGE, (byte) (leftNudgeLabel.getSelectionModel().getSelectedIndex()));
+        mainApp.fs.SetControl(FlipnicSave.Control.RIGHT_NUDGE, (byte) (rightNudgeLabel.getSelectionModel().getSelectedIndex()));
+        mainApp.fs.SetControl(FlipnicSave.Control.LEFT_FLIPPER, (byte) (leftFlipperLabel.getSelectionModel().getSelectedIndex()));
+        mainApp.fs.SetControl(FlipnicSave.Control.RIGHT_FLIPPER, (byte) (rightFlipperLabel.getSelectionModel().getSelectedIndex()));
         update(mainApp.fs);
     }
 
@@ -380,7 +414,7 @@ public class FirstForm {
         }
     }
 
-    private static class ScoreRow {
+    private class ScoreRow {
         private final String rank;
         private String initials;
         private String score;
@@ -446,6 +480,33 @@ public class FirstForm {
                 default:
                     break;
             }
+        }
+
+        public void setColumn(String column, String value) {
+            switch (column) {
+                case "Initials":
+                    setInitials(value);
+                    break;
+                case "Score":
+                    setScore(value);
+                    break;
+                case "Combos":
+                    setCombos(value);
+                    break;
+                case "Difficulty":
+                    setDifficulty(value);
+                    break;
+                default:
+                    return;
+            }
+            FlipnicSave.Difficulty diff = FlipnicSave.Difficulty.EASY;
+            diff = switch (getDifficulty()) {
+                case "Normal" -> FlipnicSave.Difficulty.NORMAL;
+                case "Hard" -> FlipnicSave.Difficulty.HARD;
+                default -> diff;
+            };
+            mainApp.fs.SetScore(gameModeSelector.getSelectionModel().getSelectedIndex(), rankingTable.getSelectionModel().getSelectedIndex(), Integer.parseInt(getScore()), getInitials(), Integer.parseInt(getCombos()), diff);
+            update(mainApp.fs);
         }
     }
 }
