@@ -7,6 +7,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.ComboBoxTableCell;
+import javafx.scene.control.cell.TextFieldTableCell;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,6 +18,8 @@ import java.util.function.Function;
 public class FirstForm {
 
     // information
+    @FXML
+    private Button updateSumsButton;
     @FXML
     private Label checkSumLabel;
     @FXML
@@ -94,6 +98,8 @@ public class FirstForm {
     private CheckBox evoCCheck;
     @FXML
     private CheckBox evoDCheck;
+    @FXML
+    private CheckBox creditsCheck;
 
     // missions
     @FXML
@@ -120,7 +126,7 @@ public class FirstForm {
         originalRad.setToggleGroup(grp);
     }
 
-    private MainApp mainApp;
+    private static MainApp mainApp;
 
     public void setMainApp(MainApp mainApp) {
         this.mainApp = mainApp;
@@ -197,6 +203,16 @@ public class FirstForm {
             stageStatusTable.setItems(FXCollections.observableList(model.getItems()));
             stageStatusTable.getColumns().add(column("Mission", Mission::getName));
             stageStatusTable.getColumns().add(column("Status", Mission::getStatus));
+            ((TableColumn<Mission, String>)stageStatusTable.getColumns().get(0)).setCellFactory(ComboBoxTableCell.forTableColumn(mainApp.fs.GetStrings()));
+            ((TableColumn<Mission, String>)stageStatusTable.getColumns().get(0)).setOnEditCommit(event -> {
+                Mission m = event.getTableView().getItems().get(event.getTablePosition().getRow());
+                m.setName(event.getNewValue());
+            });
+            ((TableColumn<Mission, String>)stageStatusTable.getColumns().get(1)).setCellFactory(ComboBoxTableCell.forTableColumn(new String[] {"Not completed", "Started", "Completed"}));
+            ((TableColumn<Mission, String>)stageStatusTable.getColumns().get(1)).setOnEditCommit(event -> {
+                Mission m = event.getTableView().getItems().get(event.getTablePosition().getRow());
+                m.setStatus(event.getNewValue());
+            });
         } else {
             stageStatusTable.getItems().clear();
             stageStatusTable.getColumns().clear();
@@ -224,6 +240,7 @@ public class FirstForm {
         optBCheck.setSelected(checks[8]);
         geoACheck.setSelected(checks[9]);
         evoDCheck.setSelected(checks[10]);
+        creditsCheck.setSelected(checks[11]);
     }
 
     @FXML
@@ -245,11 +262,32 @@ public class FirstForm {
         rankingTable.getColumns().add(column("Combos", ScoreRow::getCombos));
         rankingTable.getColumns().add(column("Difficulty", ScoreRow::getDifficulty));
         rankingTable.getColumns().add(column("Offset", ScoreRow::getOffset));
+        int i = 0;
+        for (TableColumn tc : rankingTable.getColumns()) {
+            if (i == rankingTable.getColumns().size() - 1) {
+                break;
+            }
+            if (i == 4) {
+                tc.setCellFactory(ComboBoxTableCell.forTableColumn(new String[] {"Easy", "Normal", "Hard"}));
+            }
+            else if (i != 0) {
+                tc.setCellFactory(TextFieldTableCell.forTableColumn());
+            }
+            i++;
+        }
+        rankingTable.editableProperty().set(true);
     }
 
     @FXML
     private void resetButton() {
         mainApp.fs.ResetGame(freeRad.isSelected());
+        update(mainApp.fs);
+        onGameModeChanged();
+    }
+
+    @FXML
+    private void updateChecksums() {
+        mainApp.fs.UpdateChecksum();
         update(mainApp.fs);
         onGameModeChanged();
     }
@@ -267,11 +305,13 @@ public class FirstForm {
         mainApp.fs.WriteUnlock(freeRad.isSelected(), 8, optBCheck.isSelected());
         mainApp.fs.WriteUnlock(freeRad.isSelected(), 9, geoACheck.isSelected());
         mainApp.fs.WriteUnlock(freeRad.isSelected(), 10, evoDCheck.isSelected());
+        mainApp.fs.WriteUnlock(freeRad.isSelected(), 11, creditsCheck.isSelected());
         update(mainApp.fs);
     }
 
     private static <S,T> TableColumn<S,T> column(String title, Function<S,T> property) {
         TableColumn<S,T> col = new TableColumn<>(title);
+        col.editableProperty().set(true);
         col.setCellValueFactory(cellData -> new ObservableValueBase<T>() {
             @Override
             public T getValue() {
@@ -303,9 +343,9 @@ public class FirstForm {
         }
     }
 
-    private static class Mission {
-        private final String name;
-        private final String status;
+    private class Mission {
+        private String name;
+        private String status;
 
         private Mission(String name, String status) {
             this.name = name;
@@ -319,16 +359,35 @@ public class FirstForm {
         public String getStatus() {
             return status;
         }
+
+        public void setName(String value) {
+            this.name = value;
+            mainApp.fs.SetMission(missionsComboBox.getSelectionModel().getSelectedIndex(), stageStatusTable.getSelectionModel().getSelectedIndex(), value);
+            update(mainApp.fs);
+        }
+
+        public void setStatus(String value) {
+            switch (value) {
+                case "Not completed":
+                case "Started":
+                case "Completed":
+                    this.status = value;
+                default:
+                    break;
+            }
+            mainApp.fs.SetStageStatus(missionsComboBox.getSelectionModel().getSelectedIndex(), stageStatusTable.getSelectionModel().getSelectedIndex(), value);
+            update(mainApp.fs);
+        }
     }
 
     private static class ScoreRow {
         private final String rank;
-        private final String initials;
-        private final String score;
-        private final String combos;
+        private String initials;
+        private String score;
+        private String combos;
 
         private final String offset;
-        private final String difficulty;
+        private String difficulty;
 
 
         private ScoreRow(String rank, String initials, String score, String combos, String offset, String difficulty) {
@@ -364,6 +423,29 @@ public class FirstForm {
 
         public String getDifficulty() {
             return difficulty;
+        }
+
+        public void setInitials(String value) {
+            this.initials = value;
+        }
+
+        public void setScore(String value) {
+            this.score = value;
+        }
+
+        public void setCombos(String value) {
+            this.combos = value;
+        }
+
+        public void setDifficulty(String value) {
+            switch (value) {
+                case "Easy":
+                case "Normal":
+                case "Hard":
+                    this.difficulty = value;
+                default:
+                    break;
+            }
         }
     }
 }

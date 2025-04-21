@@ -25,7 +25,8 @@ public class MainApp extends Application {
     public FlipnicSave fs = new FlipnicSave(new byte[0]);
     public FirstForm mainWindow;
 
-    public String version = "0.3";
+    public String version = "0.4";
+    public String savePath = "";
 
 
     @Override
@@ -73,6 +74,7 @@ public class MainApp extends Application {
     public void loadFile(File saveFile) {
         try {
             Path path = saveFile.toPath();
+            savePath = path.toAbsolutePath().toString();
             long size = Files.size(path);
             if (size > 1048576) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);

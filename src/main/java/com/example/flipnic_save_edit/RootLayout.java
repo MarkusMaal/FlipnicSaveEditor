@@ -6,6 +6,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
 
 import java.io.File;
+import java.io.IOException;
 
 public class RootLayout {
     @FXML
@@ -38,6 +39,54 @@ public class RootLayout {
 
         if (file != null) {
             mainApp.loadFile(file);
+        }
+    }
+
+    @FXML
+    private void onSaveAsFile() {
+        FileChooser fileChooser = new FileChooser();
+        FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter("Flipnic save data", "*");
+        fileChooser.getExtensionFilters().add(extensionFilter);
+        File file = fileChooser.showSaveDialog(mainApp.getPrimaryStage());
+
+        if (file != null) {
+            try {
+                mainApp.fs.Save(file.getAbsolutePath());
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Success");
+                alert.setHeaderText("File saved successfully");
+                alert.setContentText("Location: " + file.getAbsolutePath());
+                alert.showAndWait();
+            } catch (IOException e) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText("Error saving file");
+                alert.setContentText("Details: " + e.getMessage());
+                alert.showAndWait();
+            }
+        }
+    }
+
+    @FXML
+    private void onSaveFile() {
+        if (mainApp.savePath.isEmpty()) {
+            onSaveAsFile();
+            return;
+        }
+        String file = mainApp.savePath;
+        try {
+            mainApp.fs.Save(file);
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Success");
+            alert.setHeaderText("File saved successfully");
+            alert.setContentText("Location: " + file);
+            alert.showAndWait();
+        } catch (IOException e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Error saving file");
+            alert.setContentText("Details: " + e.getMessage());
+            alert.showAndWait();
         }
     }
 

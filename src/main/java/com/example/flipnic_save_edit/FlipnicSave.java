@@ -1,5 +1,8 @@
 package com.example.flipnic_save_edit;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.*;
@@ -38,6 +41,18 @@ public class FlipnicSave {
         for (byte b : data) {
             this.dataList.add(b);
         }
+    }
+
+    public void Save(String filename) throws IOException {
+        try (FileOutputStream fos = new FileOutputStream(filename)) {
+            for (byte b : this.dataList) {
+                fos.write(b);
+            }
+        }
+    }
+
+    public String[] GetStrings() {
+        return this.validStrings;
     }
 
     // internal methods
@@ -199,16 +214,17 @@ public class FlipnicSave {
         return decoded.toString().toUpperCase();
     }
 
-    public void SetChecksum(String hexSum) {
-        String lcase = hexSum.toLowerCase();
-        int offset = 0x15;
-        for (int i = lcase.length() - 1; i >= 0; i-=2) {
-            char digitA = lcase.charAt(i);
-            char digitB = lcase.charAt(i - 1);
-            String hexByte = digitA + String.valueOf(digitB);
-            WriteByte(offset, hexToByte(hexByte));
-            offset -= 1;
-        }
+    public void UpdateChecksum() {
+        byte[] cs1 = CalcChecksum2();
+        this.WriteByte(0x0C, cs1[0]);
+        this.WriteByte(0x0D, cs1[1]);
+        this.WriteByte(0x0E, cs1[2]);
+        this.WriteByte(0x0F, cs1[3]);
+        byte[] cs2 = CalcChecksum1();
+        this.WriteByte(0x08, cs2[0]);
+        this.WriteByte(0x09, cs2[1]);
+        this.WriteByte(0x0A, cs2[2]);
+        this.WriteByte(0x0B, cs2[3]);
     }
 
     public boolean isLoaded() {
@@ -309,12 +325,12 @@ public class FlipnicSave {
     }
 
     public boolean[] getUnlocks(boolean isFreePlay) {
-        boolean[] unlocks = new boolean[11];
+        boolean[] unlocks = new boolean[12];
         byte[] unlockBytes;
         if (!isFreePlay) {
-            unlockBytes = ReadBytes(0x274C, 11);
+            unlockBytes = ReadBytes(0x274C, 12);
         } else {
-            unlockBytes = ReadBytes(0x275C, 11);
+            unlockBytes = ReadBytes(0x275C, 12);
         }
         for (int i = 0; i < unlockBytes.length; i++) {
             unlocks[i] = unlockBytes[i] == 0x03;
@@ -337,6 +353,22 @@ public class FlipnicSave {
         WriteByte(offset , (byte)(unlocked?0x03:0x00));
     }
 
+
+
+    public void SetMission(int stage, int idx, String value) {
+        if (0x114C + (stage * 0x80) + idx >= this.dataList.size()) {
+            return;
+        }
+        int offset = 0x114C + (stage * 0x80) + idx;
+        byte stringIdx = 0;
+        for (String str : validStrings) {
+            if (str.equals(value)) {
+                break;
+            }
+            stringIdx++;
+        }
+        WriteByte(offset, stringIdx);
+    }
 
     public String[] GetMissions(int idx) {
         try {
@@ -393,5 +425,25 @@ public class FlipnicSave {
             }
             return status.toArray(new String[0]);
         }
+    }
+
+    public void SetStageStatus(int stage, int idx, String value) {
+        if (0x214C + (stage * 0x20) + idx >= this.dataList.size()) {
+            return;
+        }
+        int offset = 0x214C + (stage * 0x20) + idx;
+        byte val = 0x00;
+        switch (value) {
+            case "Started":
+                val = 0x01;
+                break;
+            case "Completed":
+                val = 0x03;
+                break;
+            default:
+                break;
+        }
+        WriteByte(offset, val);
+
     }
 }

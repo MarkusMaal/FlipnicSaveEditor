@@ -4,9 +4,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.example</groupId>
+    <groupId>com.paktc</groupId>
     <artifactId>flipnic_save_edit</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.4</version>
     <name>flipnic_save_edit</name>
 
     <properties>
