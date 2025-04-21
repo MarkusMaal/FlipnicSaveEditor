@@ -2,10 +2,9 @@ package com.example.flipnic_save_edit;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HexFormat;
-import java.util.List;
+import java.util.*;
+import java.util.zip.CRC32;
+import java.util.zip.Checksum;
 
 public class FlipnicSave {
 
@@ -51,7 +50,7 @@ public class FlipnicSave {
     }
 
     private byte[] ReadBytes(int addr, int count) {
-        if (addr + count >= this.dataList.size()) {
+        if (addr + count > this.dataList.size()) {
             System.out.println("Invalid range: " + addr + " to " + (addr+count));
             return new byte[count];
         }
@@ -64,7 +63,7 @@ public class FlipnicSave {
         return returnArray;
     }
     private byte[] ReadBytesLE(int addr, int count) {
-        if (addr + count >= this.dataList.size()) {
+        if (addr + count > this.dataList.size()) {
             System.out.println("Invalid range: " + addr + " to " + (addr+count));
             return new byte[count];
         }
@@ -155,13 +154,48 @@ public class FlipnicSave {
         }
     }
 
+    // calculates the first checksum, found at offsets 0x8-0xb
+    public byte[] CalcChecksum1() {
+        byte[] gameData = ReadBytes(0xc, this.dataList.size() - 0xc);
+        Checksum chkSum = new CRC32();
+        chkSum.update(gameData, 0, gameData.length);
+        ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
+        buffer.putLong(chkSum.getValue()  ^ 0xFFFFFFFFL);
+        byte[] BeArray = buffer.array();
+        return new byte[]{BeArray[7],BeArray[6],BeArray[5],BeArray[4]}; // output 32-bit LE
+    }
+
+    // calculates the second checksum, found at offsets 0xc-0xf
+    public byte[] CalcChecksum2() {
+        byte[] gameData = ReadBytes(0x10, this.dataList.size() - 0x10);
+        Checksum chkSum = new CRC32();
+        chkSum.update(gameData, 0, gameData.length);
+        ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
+        buffer.putLong(chkSum.getValue()  ^ 0xFFFFFFFFL);
+        byte[] BeArray = buffer.array();
+        return new byte[]{BeArray[7],BeArray[6],BeArray[5],BeArray[4]}; // output 32-bit LE
+    }
+
+    public boolean ConfirmChecksums(boolean secondary) {
+        return Arrays.equals(ReadBytes(secondary ? 0xc : 0x8, 0x4), secondary ? CalcChecksum2() : CalcChecksum1());
+    }
+
     // general methods with abstraction layer
-    public String GetChecksum() {
-        byte[] rawChecksum = ReadBytes(0x8, 0x8);
+    public String GetChecksum(boolean secondary) {
+        byte[] rawChecksum = ReadBytes(secondary ? 0xc : 0x8, 0x4);
+        byte[] onlineChecksum = secondary ? CalcChecksum2() : CalcChecksum1();
+        boolean match = true;
         StringBuilder decoded = new StringBuilder();
+        StringBuilder decodedOnline = new StringBuilder();
         for (int i = rawChecksum.length - 1; i >= 0; i--) {
+            if (match) {
+                match = rawChecksum[i] == onlineChecksum[i];
+            }
             decoded.append(byteToHex(rawChecksum[i]));
+            decodedOnline.append(byteToHex(onlineChecksum[i]));
         }
+        System.out.println("Offline checksum: " + decoded.toString().toUpperCase());
+        System.out.println("Online checksum: " + decodedOnline.toString().toUpperCase());
         return decoded.toString().toUpperCase();
     }
 
@@ -184,7 +218,7 @@ public class FlipnicSave {
     public boolean isValidSave() {
         byte[] reference = HexFormat.of().parseHex("3402cb0f43553624");
         byte[] actual = this.ReadBytes(0, 8);
-        return Arrays.equals(reference, actual);
+        return Arrays.equals(reference, actual) && ConfirmChecksums(true) && ConfirmChecksums(false);
     }
 
     public int GetCurrentScore() {

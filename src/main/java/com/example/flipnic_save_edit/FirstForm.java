@@ -18,6 +18,8 @@ public class FirstForm {
     // information
     @FXML
     private Label checkSumLabel;
+    @FXML
+    private Label redundantChecksumLabel;
 
     @FXML
     private Label currentScoreLabel;
@@ -136,7 +138,8 @@ public class FirstForm {
     public void update(FlipnicSave fs) {
         if (fs.isLoaded()) {
             // information
-            checkSumLabel.setText(fs.GetChecksum());
+            redundantChecksumLabel.setText(fs.GetChecksum(false) + " (" + (fs.ConfirmChecksums(false) ? "Valid" : "Invalid") + ")");
+            checkSumLabel.setText(fs.GetChecksum(true) + " (" + (fs.ConfirmChecksums(true) ? "Valid" : "Invalid") + ")");
             currentScoreLabel.setText(String.valueOf(fs.GetCurrentScore()));
             currentStageLabel.setText(fs.GetCurrentStage());
             // options

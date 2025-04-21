@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.flipnic_save_edit.FirstForm">
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.flipnic_save_edit.FirstForm">
    <children>
       <TabPane accessibleRoleDescription="Save editor tab navigation panel" accessibleText="Use Control+Tab to navigate between various tabs" layoutX="3.0" layoutY="47.0" prefHeight="400.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <tabs>
@@ -28,7 +28,7 @@
                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                       </rowConstraints>
                       <children>
-                          <Label fx:id="checkSumLabel" accessibleRoleDescription="Checksum value" accessibleText="A unique identifier, for verifying save file integrity" alignment="TOP_LEFT" prefHeight="23.0" prefWidth="291.0" text="No file loaded" textAlignment="CENTER" GridPane.columnIndex="1">
+                          <Label fx:id="checkSumLabel" accessibleRoleDescription="Checksum value" accessibleText="A unique identifier, for verifying save file integrity" alignment="TOP_LEFT" prefHeight="23.0" prefWidth="291.0" text="No file loaded" textAlignment="CENTER" GridPane.columnIndex="1" GridPane.rowIndex="1">
                               <font>
                                   <Font name="Calibri" size="18.0" />
                               </font>
@@ -36,16 +36,16 @@
                                   <Insets left="5.0" />
                               </GridPane.margin>
                           </Label>
-                          <Label alignment="CENTER_RIGHT" prefHeight="21.0" prefWidth="293.0" text="Checksum:">
+                          <Label alignment="CENTER_RIGHT" prefHeight="21.0" prefWidth="293.0" text="Secondary checksum:" GridPane.rowIndex="1">
                               <font>
                                   <Font name="Calibri" size="17.0" />
                               </font></Label>
-                           <Label alignment="CENTER_RIGHT" prefHeight="22.0" prefWidth="294.0" text="Current score:" GridPane.rowIndex="1">
+                           <Label alignment="CENTER_RIGHT" prefHeight="22.0" prefWidth="294.0" text="Current score:" GridPane.rowIndex="2">
                               <font>
                                  <Font name="Calibri" size="17.0" />
                               </font>
                            </Label>
-                           <Label fx:id="currentScoreLabel" prefHeight="21.0" prefWidth="297.0" text="0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                           <Label fx:id="currentScoreLabel" prefHeight="21.0" prefWidth="297.0" text="0" GridPane.columnIndex="1" GridPane.rowIndex="2">
                               <font>
                                  <Font name="Calibri" size="17.0" />
                               </font>
@@ -53,18 +53,34 @@
                                  <Insets left="5.0" />
                               </GridPane.margin>
                            </Label>
-                           <Label alignment="CENTER_RIGHT" prefHeight="21.0" prefWidth="296.0" text="Current stage:" GridPane.rowIndex="2">
+                           <Label alignment="CENTER_RIGHT" prefHeight="21.0" prefWidth="296.0" text="Current stage:" GridPane.rowIndex="3">
                               <font>
                                  <Font name="Calibri" size="17.0" />
                               </font>
                            </Label>
-                           <Label fx:id="currentStageLabel" text="Biology A" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                           <Label fx:id="currentStageLabel" text="Biology A" GridPane.columnIndex="1" GridPane.rowIndex="3">
                               <font>
                                  <Font name="Calibri" size="17.0" />
                               </font>
                               <GridPane.margin>
                                  <Insets left="5.0" />
                               </GridPane.margin>
+                           </Label>
+                           <Label fx:id="redundantChecksumLabel" prefHeight="23.0" prefWidth="291.0" text="No file loaded" GridPane.columnIndex="1">
+                              <font>
+                                 <Font name="Calibri" size="18.0" />
+                              </font>
+                              <GridPane.margin>
+                                 <Insets left="5.0" />
+                              </GridPane.margin>
+                           </Label>
+                           <Label text="Primary checksum:" textAlignment="RIGHT" GridPane.halignment="RIGHT">
+                              <GridPane.margin>
+                                 <Insets right="5.0" />
+                              </GridPane.margin>
+                              <font>
+                                 <Font name="Calibri" size="17.0" />
+                              </font>
                            </Label>
                       </children>
                   </GridPane>
