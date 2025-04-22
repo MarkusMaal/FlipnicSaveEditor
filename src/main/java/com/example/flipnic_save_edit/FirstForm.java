@@ -204,28 +204,35 @@ public class FirstForm {
             MModel model = new MModel();
             int statusIdx = missionsComboBox.getSelectionModel().getSelectedIndex();
             String[] status = mainApp.fs.GetStageStatus(statusIdx);
+            String[] types = mainApp.fs.GetMissionTypes(statusIdx);
             int i = 0;
             if (missions.isEmpty()) {
                 return;
             }
             for (String mission: this.missions.get(statusIdx)) {
                 if (i < status.length) {
-                    model.getItems().add(new Mission(mission, status[i]));
+                    model.getItems().add(new Mission(types[i], mission, status[i]));
                 } else {
-                    model.getItems().add(new Mission(mission, "Out of range"));
+                    model.getItems().add(new Mission(types[i], mission, "Out of range"));
                 }
                 i++;
             }
             stageStatusTable.setItems(FXCollections.observableList(model.getItems()));
+            stageStatusTable.getColumns().add(column("Type", Mission::getType));
             stageStatusTable.getColumns().add(column("Mission", Mission::getName));
             stageStatusTable.getColumns().add(column("Status", Mission::getStatus));
-            ((TableColumn<Mission, String>)stageStatusTable.getColumns().get(0)).setCellFactory(ComboBoxTableCell.forTableColumn(mainApp.fs.GetStrings()));
+            ((TableColumn<Mission, String>)stageStatusTable.getColumns().get(0)).setCellFactory(ComboBoxTableCell.forTableColumn(new String[]{"Red", "Yellow"}));
             ((TableColumn<Mission, String>)stageStatusTable.getColumns().get(0)).setOnEditCommit(event -> {
+                Mission m = event.getTableView().getItems().get(event.getTablePosition().getRow());
+                m.setType(event.getNewValue());
+            });
+            ((TableColumn<Mission, String>)stageStatusTable.getColumns().get(1)).setCellFactory(ComboBoxTableCell.forTableColumn(mainApp.fs.GetStrings()));
+            ((TableColumn<Mission, String>)stageStatusTable.getColumns().get(1)).setOnEditCommit(event -> {
                 Mission m = event.getTableView().getItems().get(event.getTablePosition().getRow());
                 m.setName(event.getNewValue());
             });
-            ((TableColumn<Mission, String>)stageStatusTable.getColumns().get(1)).setCellFactory(ComboBoxTableCell.forTableColumn(new String[] {"Not completed", "Started", "Completed"}));
-            ((TableColumn<Mission, String>)stageStatusTable.getColumns().get(1)).setOnEditCommit(event -> {
+            ((TableColumn<Mission, String>)stageStatusTable.getColumns().get(2)).setCellFactory(ComboBoxTableCell.forTableColumn(new String[] {"Not completed", "Started", "Completed"}));
+            ((TableColumn<Mission, String>)stageStatusTable.getColumns().get(2)).setOnEditCommit(event -> {
                 Mission m = event.getTableView().getItems().get(event.getTablePosition().getRow());
                 m.setStatus(event.getNewValue());
             });
@@ -313,6 +320,24 @@ public class FirstForm {
     }
 
     @FXML
+    private void applyFixes() {
+        String[] fixes = mainApp.fs.FixStructure();
+        if (fixes.length == 0) {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Fix file structure");
+            alert.setHeaderText("No fixes were applied");
+            alert.setContentText("Your save file appears to have the correct structure");
+            alert.showAndWait();
+            return;
+        }
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Fix file structure");
+        alert.setHeaderText("Success");
+        alert.setContentText("Corrections were made to the save file:\n\n" + String.join("\n", fixes));
+        alert.showAndWait();
+    }
+
+    @FXML
     private void updateChecks() {
         mainApp.fs.WriteUnlock(freeRad.isSelected(), 0, bioACheck.isSelected());
         mainApp.fs.WriteUnlock(freeRad.isSelected(), 1, evoACheck.isSelected());
@@ -380,8 +405,10 @@ public class FirstForm {
     private class Mission {
         private String name;
         private String status;
+        private String type;
 
-        private Mission(String name, String status) {
+        private Mission(String type, String name, String status) {
+            this.type = type;
             this.name = name;
             this.status = status;
         }
@@ -394,8 +421,13 @@ public class FirstForm {
             return status;
         }
 
+        public String getType() {
+            return type;
+        }
+
         public void setName(String value) {
             this.name = value;
+            if (locked) return;
             mainApp.fs.SetMission(missionsComboBox.getSelectionModel().getSelectedIndex(), stageStatusTable.getSelectionModel().getSelectedIndex(), value);
             update(mainApp.fs);
         }
@@ -409,7 +441,15 @@ public class FirstForm {
                 default:
                     break;
             }
+            if (locked) return;
             mainApp.fs.SetStageStatus(missionsComboBox.getSelectionModel().getSelectedIndex(), stageStatusTable.getSelectionModel().getSelectedIndex(), value);
+            update(mainApp.fs);
+        }
+
+        public void setType(String value) {
+            this.type = value;
+            if (locked) return;
+            mainApp.fs.SetMissionType(missionsComboBox.getSelectionModel().getSelectedIndex(), stageStatusTable.getSelectionModel().getSelectedIndex(), value.equals("Red"));
             update(mainApp.fs);
         }
     }
@@ -505,6 +545,7 @@ public class FirstForm {
                 case "Hard" -> FlipnicSave.Difficulty.HARD;
                 default -> diff;
             };
+            if (locked) return;
             mainApp.fs.SetScore(gameModeSelector.getSelectionModel().getSelectedIndex(), rankingTable.getSelectionModel().getSelectedIndex(), Integer.parseInt(getScore()), getInitials(), Integer.parseInt(getCombos()), diff);
             update(mainApp.fs);
         }

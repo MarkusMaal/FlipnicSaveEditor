@@ -96,7 +96,7 @@
                                  <Insets right="5.0" />
                               </GridPane.margin>
                            </Button>
-                           <Button accessibleText="Fix other save file problems, such as the file size, headers and footers, etc." disable="true" text="_Fix save file structure" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                           <Button accessibleText="Fix other save file problems, such as the file size, headers and footers, etc." onAction="#applyFixes" text="_Fix save file structure" GridPane.columnIndex="1" GridPane.rowIndex="4">
                               <GridPane.margin>
                                  <Insets left="5.0" />
                               </GridPane.margin>
@@ -253,6 +253,7 @@
                         <Label fx:id="missionsLabel" layoutX="14.0" layoutY="46.0" text="Nothing to show here..." AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="50.0" />
                         <TableView fx:id="stageStatusTable" editable="true" layoutX="10.0" layoutY="43.0" prefHeight="322.0" prefWidth="578.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="50.0">
                           <columns>
+                              <TableColumn prefWidth="75.0" text="Type" />
                             <TableColumn prefWidth="437.0" text="Mission" />
                             <TableColumn minWidth="0.0" prefWidth="141.0" text="Status" />
                           </columns>

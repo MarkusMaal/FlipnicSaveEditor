@@ -15,7 +15,7 @@ import java.util.zip.Checksum;
 public class FlipnicSave {
 
     // declarations
-    private final List<Byte> dataList = new ArrayList<>();
+    private List<Byte> dataList = new ArrayList<>();
 
     private final String[] gameModes = {"Original game", "Biology A", "Biology B", "Metallurgy A", "Metallurgy B", "Optics A", "Optics B", "Geometry A",
             "Biology A (Time Attack)", "Biology B (Time Attack)", "Metallurgy A (Time Attack)", "Metallurgy B (Time Attack)", "Optics A (Time Attack)", "Optics B (Time Attack)", "Geometry A (Time Attack)"};
@@ -72,6 +72,10 @@ public class FlipnicSave {
                 fos.write(b);
             }
         }
+    }
+
+    public List<Byte> Read() {
+        return this.dataList;
     }
 
     // internal methods
@@ -237,9 +241,13 @@ public class FlipnicSave {
     }
 
     public boolean isValidSave() {
+        return ConfirmChecksums(true) && ConfirmChecksums(false);
+    }
+
+    public boolean isValidHeader() {
         byte[] reference = HexFormat.of().parseHex("3402cb0f43553624");
         byte[] actual = this.ReadBytes(0, 8);
-        return Arrays.equals(reference, actual) && ConfirmChecksums(true) && ConfirmChecksums(false);
+        return Arrays.equals(reference, actual);
     }
 
     public int GetCurrentScore() {
@@ -406,6 +414,45 @@ public class FlipnicSave {
         WriteByte(offset , (byte)(unlocked?0x03:0x00));
     }
 
+    public String[] GetMissionTypes(int idx) {
+        try {
+            System.out.println(0x194C + (idx * 0x40));
+            if (0x194C + (idx * 0x64) >= this.dataList.size()) {
+                return new String[0];
+            } else {
+                int offset = 0x194C + (idx * 0x40);
+                ArrayList<String> types = new ArrayList<>();
+
+                while (offset < 0x194C + (idx * 0x40) + 0x40) {
+                    try {
+                        if (ReadByte(offset) > 0) {
+                            types.add("Red");
+                            System.out.print("RED " + offset + " ");
+                        } else {
+                            types.add("Yellow");
+                            System.out.print("YELLOW " + offset + " ");
+                        }
+                    } catch (Exception ex) {
+                        types.add("Invalid");
+                    }
+                    offset += 2;
+                }
+                return types.toArray(new String[0]);
+            }
+        } catch (Exception ex) {
+            String[] error = {"Corrupted data"};
+            return error;
+        }
+    }
+
+    public void SetMissionType(int stage, int idx, boolean isRed) {
+        if (0x194C + (stage * 0x40) + (idx*2) >= this.dataList.size()) {
+            return;
+        }
+        int offset = 0x194C + (stage * 0x40) + (idx*2);
+        byte value = (byte) (isRed ? 0x01 : 0x00);
+        WriteByte(offset, value);
+    }
 
 
     public void SetMission(int stage, int idx, String value) {
@@ -498,5 +545,57 @@ public class FlipnicSave {
         }
         WriteByte(offset, val);
 
+    }
+
+    public String[] FixStructure() {
+        List<String> fixes = new ArrayList<>();
+        if (SizeFix()) fixes.add("Save size fix");
+        if (HeaderFix()) fixes.add("Header fix");
+        if (FooterFix()) fixes.add("Footer fix");
+        if (ChecksumFix()) fixes.add("Checksum fix"); // always do this one last
+        return fixes.toArray(new String[0]);
+    }
+
+    private boolean FooterFix() {
+        byte[] reference = new byte[]{0x22,0x53,0x33,0x02};
+        byte[] actual = this.ReadBytes(this.dataList.size() - 5, 4);
+        boolean match = Arrays.equals(reference, actual);
+        if (match) return false;
+        WriteByte(0x277C, (byte)0x22);
+        WriteByte(0x277D, (byte)0x53);
+        WriteByte(0x277E, (byte)0x33);
+        WriteByte(0x277F, (byte)0x02);
+        return true;
+    }
+
+    private boolean ChecksumFix() {
+        if (isValidSave()) return false;
+        UpdateChecksum();
+        return true;
+    }
+
+    private boolean HeaderFix() {
+        if (isValidHeader()) return false;
+        this.dataList.set(0, (byte)0x34);
+        this.dataList.set(1, (byte)0x02);
+        this.dataList.set(2, (byte)0xCB);
+        this.dataList.set(3, (byte)0x0F);
+        this.dataList.set(4, (byte)0x43);
+        this.dataList.set(5, (byte)0x55);
+        this.dataList.set(6, (byte)0x36);
+        this.dataList.set(7, (byte)0x24);
+        return true;
+    }
+
+    private boolean SizeFix() {
+        if (this.dataList.size() == 0x2780) return false;
+        if (this.dataList.size() > 0x2780) {
+            this.dataList = this.dataList.subList(0, 0x277F);
+            return true;
+        }
+        while (this.dataList.size() < 0x2780) {
+            this.dataList.add((byte) 0x00);
+        }
+        return true;
     }
 }

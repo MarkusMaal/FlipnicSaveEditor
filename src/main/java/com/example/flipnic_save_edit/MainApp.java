@@ -67,6 +67,7 @@ public class MainApp extends Application {
         launch();
     }
 
+
     public Stage getPrimaryStage() {
         return this.primaryStage;
     }
@@ -88,9 +89,15 @@ public class MainApp extends Application {
             this.fs = new FlipnicSave(this.rawData);
             if (!fs.isValidSave()) {
                 Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Checksum mismatch");
+                alert.setHeaderText("Failed to validate checksums");
+                alert.setContentText("The save file may be corrupt");
+                alert.showAndWait();
+            }
+            if (!fs.isValidHeader()) {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
                 alert.setTitle("Header mismatch");
-                alert.setHeaderText("File header is not correct");
-                alert.setContentText("The save file may be unsupported by this program or corrupted.");
+                alert.setHeaderText("File header is not correct, but nobody cares");
                 alert.showAndWait();
             }
             primaryStage.setTitle("Flipnic Save Editor " + this.version + " - " + saveFile.getName());
