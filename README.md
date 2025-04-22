@@ -6,8 +6,6 @@ This tool allows you to edit Flipnic save files as well as partially fix corrupt
 
 ***TODO***: Improve README.md
 
-***TODO***: "Fix save file structure" button functionality
-
 ## Locating the save file
 
 Here is a list of known game IDs for Flipnic:
@@ -50,8 +48,29 @@ Allows you to configure settings that you'd normally have to change by going aro
 
 ### "Unlocks" tab
 
-Allows you to toggle on/off unlocked stages in both original game and free play modes. The game normally duplicates the state of original game, but when you use the "retry" option in-game, it only resets the original game unlocks.
+Allows you to toggle on/off unlocked stages in both original game and free play modes. The game normally duplicates the state of original game, but when you use the "retry" option in-game, it only resets the original game unlocks. You can also force score mode on a specific stage, which allows you to play with score enabled on a previously cleared stage.
 
 ### "Missions" tab
 
 Allows you to change states of various missions (e.g. COMPLETED) and their in-game labels (e.g. FREEZE OVER).
+
+### "Stages" tab
+
+Allows you to change the order of stages in original game or even assign 2P stages to original game stages. The directory names are internal names for the stages. Here's what stage they correspond to:
+
+* JUNGLE1 = Biology A
+* JUNGLE2 = Biology B
+* ISEKI1 = Metallurgy A
+* ISEKI2 = Metallurgy B
+* HIKARI1 = Optics A
+* HIKARI2 = Optics B
+* RETRO1 = Geometry A
+* BOSS1 = Evolution A
+* BOSS2 = Evolution B
+* BOSS3 = Evolution C
+* BOSS4 = Evolution D
+* VS1 = Biology 2P
+* VS2 = Metallurgy 2P
+* VS3 = Optics 2P
+* VS4 = Geometry 2P
+* DEMO1 = Unused
