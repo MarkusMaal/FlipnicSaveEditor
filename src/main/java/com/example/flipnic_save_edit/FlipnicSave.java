@@ -38,6 +38,7 @@ public class FlipnicSave {
             "LOOP THE LOOP 3", "CHU CHU MULTIBALL", "SPACE WARP", "ALIEN HILL", "AREA 74", "GALAXY TENNIS", "100 BLOCKS", "WARM-COLORED BLOCKS"};
     private static String[] inputs = {"L2", "R2", "L1", "R1", "Triangle", "Circle", "Cross", "Square", "Unknown 8", "Unknown 9", "Unknown A", "Unknown B", "DPad Up", "DPad Right", "DPad Down", "DPad Left"};
     private final int[] missionOffsets = {0x114C, 0x124C, 0x134C, 0x144C, 0x14CC, 0x154C, 0x15CC};
+    private String[] stageDir = {"JUNGLE1", "ISEKI1", "BOSS1", "RETRO1", "HIKARI1", "DEMO1", "JUNGLE2", "ISEKI2", "HIKARI2", "VS1", "VS2", "VS3", "VS4", "BOSS2", "BOSS3", "BOSS4"};
 
     public enum Options {
         SOUND_MODE,
@@ -258,11 +259,27 @@ public class FlipnicSave {
     public String GetCurrentStage() {
         byte[] stageIdBytes = this.ReadBytesLE(0x10C8, 0x4);
         int stageId = ByteBuffer.wrap(stageIdBytes).getInt();
+        int backupStageId = 11;
+        for (int offset = 0x2756; offset > 0x274B; offset--) {
+            if (ReadByte(offset) == 0x03) {
+                break;
+            }
+            backupStageId--;
+        }
+        if (stageId == 0x0B) stageId = backupStageId;
         if ((stageId < originalModes.length) && (stageId >= 0)) {
             return originalModes[stageId];
         } else {
             return "Out of range";
         }
+    }
+
+    public void SetCurrentStage(int value) {
+        WriteByte(0x10C8, (byte)value);
+    }
+
+    public int GetExplicitStage() {
+        return ByteBuffer.wrap(this.ReadBytesLE(0x10C8, 0x4)).getInt();
     }
 
     public void SetScore(int mode, int idx, int score, String initials, int combos, Difficulty difficulty) {
@@ -314,21 +331,12 @@ public class FlipnicSave {
         int combos = ByteBuffer.wrap(combosBytes).getInt();
         byte[] difficultyBytes = {scoreData[0xB], scoreData[0xA], scoreData[0x9], scoreData[0x8]};
         int difficultyId = ByteBuffer.wrap(difficultyBytes).getInt();
-        String difficulty;
-        switch (difficultyId) {
-            case 0:
-                difficulty = "Easy";
-                break;
-            case 1:
-                difficulty = "Normal";
-                break;
-            case 2:
-                difficulty = "Hard";
-                break;
-            default:
-                difficulty = "(null)";
-                break;
-        }
+        String difficulty = switch (difficultyId) {
+            case 0 -> "Easy";
+            case 1 -> "Normal";
+            case 2 -> "Hard";
+            default -> "(null)";
+        };
         return ((rank) + ";" + initials + ";" + scoreVal + ";" + combos + ";" + offset + ";" + difficulty + ";" + gameModes[modeIdx]).split(";", 0);
     }
 
@@ -558,7 +566,7 @@ public class FlipnicSave {
 
     private boolean FooterFix() {
         byte[] reference = new byte[]{0x22,0x53,0x33,0x02};
-        byte[] actual = this.ReadBytes(this.dataList.size() - 5, 4);
+        byte[] actual = this.ReadBytes(this.dataList.size() - 4, 4);
         boolean match = Arrays.equals(reference, actual);
         if (match) return false;
         WriteByte(0x277C, (byte)0x22);
@@ -597,5 +605,20 @@ public class FlipnicSave {
             this.dataList.add((byte) 0x00);
         }
         return true;
+    }
+
+    public String[] getStageDirs() {
+        List<String> dirs = new ArrayList<>();
+        for (int offset = 4300; offset < 4344; offset+=4)
+            dirs.add(stageDir[ByteBuffer.wrap(ReadBytesLE(offset, 4)).getInt()]);
+        return dirs.toArray(new String[0]);
+    }
+
+    public void setStageDir(int idx, int value) {
+        WriteByte(4300+(byte)(idx*4), (byte)value);
+    }
+
+    public String[] allStageDirs() {
+        return this.stageDir;
     }
 }

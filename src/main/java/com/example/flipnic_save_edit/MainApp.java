@@ -25,8 +25,9 @@ public class MainApp extends Application {
     public FlipnicSave fs = new FlipnicSave(new byte[0]);
     public FirstForm mainWindow;
 
-    public String version = "0.5";
+    public String version = "0.6";
     public String savePath = "";
+    public final static String[] friendlyStageNames = "Biology A,Evolution A,Metallurgy A,Evolution B,Optics A,Evolution C,Biology B,Metallurgy B,Optics B,Geometry A,Evolution D".split(",");
 
 
     @Override

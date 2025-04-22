@@ -17,6 +17,10 @@ import java.util.function.Function;
 
 public class FirstForm {
 
+    public TableView stageDirTable;
+
+    public CheckBox forceStageCheckbox;
+    public ComboBox forceStageCombobox;
     // information
     @FXML
     private Button updateSumsButton;
@@ -129,6 +133,7 @@ public class FirstForm {
         strings = new ArrayList<>(Arrays.asList(this.stages));
 
         missionsComboBox.setItems(FXCollections.observableList(strings));
+        forceStageCombobox.setItems(FXCollections.observableList(Arrays.stream(MainApp.friendlyStageNames).toList()));
         bgmVolumeLabel.setItems(FXCollections.observableList(numbers));
         sfxVolumeLabel.setItems(FXCollections.observableList(numbers));
         soundModeLabel.setItems(FXCollections.observableList(List.of(soundModes)));
@@ -174,8 +179,10 @@ public class FirstForm {
             leftFlipperLabel.getSelectionModel().select(fs.getLeftFlipper());
             rightFlipperLabel.getSelectionModel().select(fs.getRightFlipper());
             onGameModeChanged();
-            // missions
+            // misc
             updateMissions();
+            updateStageDirs();
+            updateForcedStage();
         } else {
             // information
             checkSumLabel.setText("Not loaded");
@@ -193,6 +200,29 @@ public class FirstForm {
             rightFlipperLabel.getSelectionModel().select(0);
         }
         locked = false;
+    }
+
+    @SuppressWarnings("unchecked")
+    private void updateStageDirs() {
+        if (!mainApp.fs.isLoaded()) return;
+        stageDirTable.getItems().clear();
+        stageDirTable.getColumns().clear();
+        SModel model = new SModel();
+        int i = 0;
+        for (String stageDir: mainApp.fs.getStageDirs()) {
+            model.getItems().add(new StageRow(MainApp.friendlyStageNames[i], stageDir));
+            i++;
+        }
+        stageDirTable.setItems(FXCollections.observableList(model.getItems()));
+        stageDirTable.getColumns().add(column("Stage", StageRow::getKey));
+        stageDirTable.getColumns().add(column("Directory", StageRow::getValue));
+        ((TableColumn<StageRow, String>)stageDirTable.getColumns().get(0)).setPrefWidth(150);
+        ((TableColumn<StageRow, String>)stageDirTable.getColumns().get(1)).setCellFactory(ComboBoxTableCell.forTableColumn(mainApp.fs.allStageDirs()));
+        ((TableColumn<StageRow, String>)stageDirTable.getColumns().get(1)).setPrefWidth(150);
+        ((TableColumn<StageRow, String>)stageDirTable.getColumns().get(1)).setOnEditCommit(event -> {
+            StageRow sr = event.getTableView().getItems().get(event.getTablePosition().getRow());
+            sr.setValue(event.getNewValue());
+        });
     }
 
     @SuppressWarnings("unchecked")
@@ -221,17 +251,20 @@ public class FirstForm {
             stageStatusTable.getColumns().add(column("Type", Mission::getType));
             stageStatusTable.getColumns().add(column("Mission", Mission::getName));
             stageStatusTable.getColumns().add(column("Status", Mission::getStatus));
-            ((TableColumn<Mission, String>)stageStatusTable.getColumns().get(0)).setCellFactory(ComboBoxTableCell.forTableColumn(new String[]{"Red", "Yellow"}));
-            ((TableColumn<Mission, String>)stageStatusTable.getColumns().get(0)).setOnEditCommit(event -> {
+            ((TableColumn<Mission, String>)stageStatusTable.getColumns().getFirst()).setCellFactory(ComboBoxTableCell.forTableColumn(new String[]{"Red", "Yellow"}));
+            ((TableColumn<Mission, String>)stageStatusTable.getColumns().getFirst()).setPrefWidth(100);
+            ((TableColumn<Mission, String>)stageStatusTable.getColumns().getFirst()).setOnEditCommit(event -> {
                 Mission m = event.getTableView().getItems().get(event.getTablePosition().getRow());
                 m.setType(event.getNewValue());
             });
             ((TableColumn<Mission, String>)stageStatusTable.getColumns().get(1)).setCellFactory(ComboBoxTableCell.forTableColumn(mainApp.fs.GetStrings()));
+            ((TableColumn<Mission, String>)stageStatusTable.getColumns().get(1)).setPrefWidth(250);
             ((TableColumn<Mission, String>)stageStatusTable.getColumns().get(1)).setOnEditCommit(event -> {
                 Mission m = event.getTableView().getItems().get(event.getTablePosition().getRow());
                 m.setName(event.getNewValue());
             });
             ((TableColumn<Mission, String>)stageStatusTable.getColumns().get(2)).setCellFactory(ComboBoxTableCell.forTableColumn(new String[] {"Not completed", "Started", "Completed"}));
+            ((TableColumn<Mission, String>)stageStatusTable.getColumns().get(2)).setPrefWidth(150);
             ((TableColumn<Mission, String>)stageStatusTable.getColumns().get(2)).setOnEditCommit(event -> {
                 Mission m = event.getTableView().getItems().get(event.getTablePosition().getRow());
                 m.setStatus(event.getNewValue());
@@ -264,6 +297,8 @@ public class FirstForm {
         geoACheck.setSelected(checks[9]);
         evoDCheck.setSelected(checks[10]);
         creditsCheck.setSelected(checks[11]);
+        forceStageCombobox.setVisible(originalRad.isSelected());
+        forceStageCheckbox.setVisible(originalRad.isSelected());
     }
 
     @FXML
@@ -290,10 +325,16 @@ public class FirstForm {
             if (i == rankingTable.getColumns().size() - 1) {
                 break;
             }
-            if (i == 4) {
-                tc.setCellFactory(ComboBoxTableCell.forTableColumn(new String[] {"Easy", "Normal", "Hard"}));
+            switch (i) {
+                case 4:
+                    tc.setPrefWidth(100);
+                    tc.setCellFactory(ComboBoxTableCell.forTableColumn(new String[] {"Easy", "Normal", "Hard"}));
+                    break;
+                case 2:
+                    tc.setPrefWidth(100);
+                    break;
             }
-            else if (i != 0) {
+            if (i != 0 && (i != 4)) {
                 tc.setCellFactory(TextFieldTableCell.forTableColumn());
             }
             tc.setOnEditCommit(event -> {
@@ -355,6 +396,23 @@ public class FirstForm {
     }
 
     @FXML
+    private void updateForcedStage() {
+        if (locked) {
+            forceStageCheckbox.setSelected(mainApp.fs.GetExplicitStage() != 0x0B);
+            if (forceStageCheckbox.isSelected()) {
+                forceStageCombobox.getSelectionModel().select(mainApp.fs.GetExplicitStage());
+            }
+        }
+        forceStageCombobox.setDisable(!forceStageCheckbox.isSelected());
+        if (locked) return;
+        mainApp.fs.SetCurrentStage(!forceStageCheckbox.isSelected() ? 0x0B : forceStageCombobox.getSelectionModel().getSelectedIndex());
+        if (forceStageCheckbox.isSelected() && (forceStageCombobox.getSelectionModel().getSelectedIndex() == -1)) {
+            return;
+        }
+        update(mainApp.fs);
+    }
+
+    @FXML
     private void updateSettings() {
         if (locked) return; // prevent weird race conditions
         mainApp.fs.SetOption(FlipnicSave.Options.SOUND_MODE, (byte) ((soundModeLabel.getSelectionModel().getSelectedIndex() == 0) ? 0 : 1));
@@ -398,6 +456,17 @@ public class FirstForm {
         }
 
         public List<Mission> getItems() {
+            return items ;
+        }
+    }
+    public static class SModel {
+        private List<StageRow> items ;
+
+        public SModel() {
+            this.items = new ArrayList<>();
+        }
+
+        public List<StageRow> getItems() {
             return items ;
         }
     }
@@ -450,6 +519,38 @@ public class FirstForm {
             this.type = value;
             if (locked) return;
             mainApp.fs.SetMissionType(missionsComboBox.getSelectionModel().getSelectedIndex(), stageStatusTable.getSelectionModel().getSelectedIndex(), value.equals("Red"));
+            update(mainApp.fs);
+        }
+    }
+
+    private class StageRow {
+        private final String key;
+        private String value;
+
+        private StageRow(String key, String value) {
+            this.key = key;
+            this.value = value;
+        }
+
+        public String getKey() {
+            return key;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
+            if (locked) return;
+            int stgIdx = 0;
+            for (String name : mainApp.fs.allStageDirs()) {
+                if (value.equals(name)) {
+                    break;
+                }
+                stgIdx++;
+            }
+            mainApp.fs.setStageDir(stageDirTable.getSelectionModel().getSelectedIndex(), stgIdx);
             update(mainApp.fs);
         }
     }

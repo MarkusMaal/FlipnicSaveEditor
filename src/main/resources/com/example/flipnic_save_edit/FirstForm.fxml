@@ -242,25 +242,41 @@
                            </children>
                         </FlowPane>
                         <Button accessibleRoleDescription="Reset progress" accessibleText="Reset all unlocks for selected game type" layoutX="534.0" layoutY="6.0" onAction="#resetButton" text="_Reset" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
+                         <FlowPane alignment="BOTTOM_LEFT" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="150.0">
+                             <CheckBox fx:id="forceStageCheckbox" mnemonicParsing="false" onAction="#updateForcedStage" text="Force score mode">
+                                <FlowPane.margin>
+                                    <Insets left="5.0" top="5.0" />
+                                </FlowPane.margin>
+                             </CheckBox>
+                             <ComboBox fx:id="forceStageCombobox" onAction="#updateForcedStage" prefHeight="26.0" prefWidth="207.0">
+                                <FlowPane.margin>
+                                    <Insets left="15.0" top="5.0" />
+                                </FlowPane.margin>
+                             </ComboBox>
+                         </FlowPane>
                      </children></AnchorPane>
             </content>
           </Tab>
-        <Tab text="Missions">
-            <content>
+            <Tab text="Missions">
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                     <children>
-                        <ComboBox fx:id="missionsComboBox" accessibleRoleDescription="Stage name" layoutX="14.0" layoutY="14.0" onAction="#onMissionStageChanged" prefHeight="25.0" prefWidth="575.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
-                        <Label fx:id="missionsLabel" layoutX="14.0" layoutY="46.0" text="Nothing to show here..." AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="50.0" />
-                        <TableView fx:id="stageStatusTable" editable="true" layoutX="10.0" layoutY="43.0" prefHeight="322.0" prefWidth="578.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="50.0">
-                          <columns>
-                              <TableColumn prefWidth="75.0" text="Type" />
+                    <ComboBox fx:id="missionsComboBox" accessibleRoleDescription="Stage name" layoutX="14.0" layoutY="14.0" onAction="#onMissionStageChanged" prefHeight="25.0" prefWidth="575.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
+                    <Label fx:id="missionsLabel" layoutX="14.0" layoutY="46.0" text="Nothing to show here..." AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="50.0" />
+                    <TableView fx:id="stageStatusTable" editable="true" layoutX="10.0" layoutY="43.0" prefHeight="322.0" prefWidth="578.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="50.0">
+                        <columns>
+                            <TableColumn prefWidth="75.0" text="Type" />
                             <TableColumn prefWidth="437.0" text="Mission" />
                             <TableColumn minWidth="0.0" prefWidth="141.0" text="Status" />
-                          </columns>
-                        </TableView>
-                     </children></AnchorPane>
-            </content>
-        </Tab>
+                        </columns>
+                    </TableView>
+                </AnchorPane>
+            </Tab>
+            <Tab text="Stages">
+
+                <AnchorPane accessibleRoleDescription="Stage panel" accessibleText="Displays directories used for stages. These will always have default values unless explicitly changed." minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                    <TableView fx:id="stageDirTable" accessibleRoleDescription="Stage directories" editable="true" layoutX="14.0" layoutY="50.0" prefHeight="309.0" prefWidth="580.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="50.0" />
+                  <Label alignment="CENTER" contentDisplay="CENTER" layoutX="10.0" layoutY="5.0" prefHeight="39.0" prefWidth="579.0" text="This section allows you to modify the stages that will load in original game. Selecting &quot;DEMO1&quot; will cause the game to crash upon selecting the stage." textAlignment="CENTER" wrapText="true" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="11.0" AnchorPane.topAnchor="5.0" />
+                </AnchorPane>
+            </Tab>
         </tabs>
       </TabPane>
 
