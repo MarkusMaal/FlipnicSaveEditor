@@ -74,3 +74,9 @@ Allows you to change the order of stages in original game or even assign 2P stag
 * VS3 = Optics 2P
 * VS4 = Geometry 2P
 * DEMO1 = Unused
+
+# Hex pattern file
+
+If you want to manually explore Flipnic save files with a hex editor that supports hexpat files, such as ImHex, you can import the [flipnicsave.hexpat](flipnicsave.hexpat) to get highlighting for what various bytes within the save file do.
+
+This pattern file is used in the building of this save file editor. There are some bytes we are unsure about, but at least 78% of the save file is documented within this file.
