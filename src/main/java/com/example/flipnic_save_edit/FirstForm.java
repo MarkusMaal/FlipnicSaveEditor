@@ -10,9 +10,12 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.TextFieldTableCell;
 
+import java.io.File;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 
 public class FirstForm {
@@ -21,6 +24,9 @@ public class FirstForm {
 
     public CheckBox forceStageCheckbox;
     public ComboBox forceStageCombobox;
+    public Tab optionTab;
+    public Label lastPlayedStageLabel;
+    public TabPane windowTabs;
     // information
     @FXML
     private Button updateSumsButton;
@@ -117,7 +123,7 @@ public class FirstForm {
 
     private String[] gameModes = {"Original game", "Biology A", "Biology B", "Metallurgy A", "Metallurgy B", "Optics A", "Optics B", "Geometry A",
             "Biology A (Time Attack)", "Biology B (Time Attack)", "Metallurgy A (Time Attack)", "Metallurgy B (Time Attack)", "Optics A (Time Attack)", "Optics B (Time Attack)", "Geometry A (Time Attack)"};
-    private String[] stages = {"Biology A", "Evolution A", "Metallurgy A", "Evolution B", "Optics A", "Evolution C", "Biology B", "Metallurgy B", "Optics B", "Geometry A", "Evolution D"};
+    public String[] stages = {"Biology A", "Evolution A", "Metallurgy A", "Evolution B", "Optics A", "Evolution C", "Biology B", "Metallurgy B", "Optics B", "Geometry A", "Evolution D"};
     private String[] soundModes = {"Mono", "Stereo"};
     private ArrayList<String[]> missions = new ArrayList<>();
     boolean locked = false;
@@ -145,6 +151,30 @@ public class FirstForm {
         originalRad.setToggleGroup(grp);
     }
 
+    public void ToggleDark() throws MalformedURLException {
+        MainApp.darkMode = !MainApp.darkMode;
+        if (MainApp.darkMode) {
+            mainApp.rootScene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("style.css")).toExternalForm());
+        } else {
+            mainApp.rootScene.getStylesheets().clear();
+        }
+    }
+
+    public void RefreshRegion(boolean regionJp) {
+        List<String> strings = new ArrayList<>(Arrays.asList(this.gameModes));
+        gameModeSelector.setItems(FXCollections.observableList(strings));
+        strings = new ArrayList<>(Arrays.asList(this.stages));
+        missionsComboBox.getSelectionModel().clearSelection();
+        missionsComboBox.getItems().clear();
+        missionsComboBox.setItems(FXCollections.observableList(strings));
+        forceStageCombobox.setItems(FXCollections.observableList(Arrays.stream(MainApp.friendlyStageNames).toList()));
+        evoACheck.setText(regionJp ? "Theology A" : "Evolution A");
+        evoBCheck.setText(regionJp ? "Theology B" : "Evolution B");
+        evoCCheck.setText(regionJp ? "Theology C" : "Evolution C");
+        evoDCheck.setText(regionJp ? "Theology D" : "Evolution D");
+        optionTab.setText(regionJp ? "Option" : "Options");
+    }
+
     private static MainApp mainApp;
 
     public void setMainApp(MainApp mainApp) {
@@ -162,12 +192,14 @@ public class FirstForm {
 
     public void update(FlipnicSave fs) {
         locked = true;
+        windowTabs.setDisable(!fs.isLoaded());
         if (fs.isLoaded()) {
             // information
             redundantChecksumLabel.setText(fs.GetChecksum(false) + " (" + (fs.ConfirmChecksums(false) ? "Valid" : "Invalid") + ")");
             checkSumLabel.setText(fs.GetChecksum(true) + " (" + (fs.ConfirmChecksums(true) ? "Valid" : "Invalid") + ")");
             currentScoreLabel.setText(String.valueOf(fs.GetCurrentScore()));
             currentStageLabel.setText(fs.GetCurrentStage());
+            lastPlayedStageLabel.setText(fs.GetLastPlayedStage());
             // options
             sfxVolumeLabel.getSelectionModel().select(fs.getVolumeSfx());
             bgmVolumeLabel.getSelectionModel().select(fs.getVolumeBgm());
@@ -183,11 +215,14 @@ public class FirstForm {
             updateMissions();
             updateStageDirs();
             updateForcedStage();
+            fs.GetMissionIndicies(0);
         } else {
             // information
             checkSumLabel.setText("Not loaded");
+            redundantChecksumLabel.setText(checkSumLabel.getText());
             currentScoreLabel.setText("0");
             currentStageLabel.setText("Biology A");
+            lastPlayedStageLabel.setText("N/A");
             // options
             bgmVolumeLabel.getSelectionModel().select(0);
             sfxVolumeLabel.getSelectionModel().select(0);
@@ -235,15 +270,17 @@ public class FirstForm {
             int statusIdx = missionsComboBox.getSelectionModel().getSelectedIndex();
             String[] status = mainApp.fs.GetStageStatus(statusIdx);
             String[] types = mainApp.fs.GetMissionTypes(statusIdx);
+            int[] indicies = mainApp.fs.GetMissionIndicies(statusIdx);
+            int[] pages = mainApp.fs.GetMissionPages(statusIdx);
             int i = 0;
             if (missions.isEmpty()) {
                 return;
             }
             for (String mission: this.missions.get(statusIdx)) {
                 if (i < status.length) {
-                    model.getItems().add(new Mission(types[i], mission, status[i]));
+                    model.getItems().add(new Mission(types[i], mission, status[i], indicies[i], pages[i]));
                 } else {
-                    model.getItems().add(new Mission(types[i], mission, "Out of range"));
+                    model.getItems().add(new Mission(types[i], mission, "Out of range", indicies[i], pages[i]));
                 }
                 i++;
             }
@@ -251,6 +288,8 @@ public class FirstForm {
             stageStatusTable.getColumns().add(column("Type", Mission::getType));
             stageStatusTable.getColumns().add(column("Mission", Mission::getName));
             stageStatusTable.getColumns().add(column("Status", Mission::getStatus));
+            stageStatusTable.getColumns().add(column("Index", Mission::getIndex));
+            stageStatusTable.getColumns().add(column("Page count", Mission::getPages));
             ((TableColumn<Mission, String>)stageStatusTable.getColumns().getFirst()).setCellFactory(ComboBoxTableCell.forTableColumn(new String[]{"Red", "Yellow"}));
             ((TableColumn<Mission, String>)stageStatusTable.getColumns().getFirst()).setPrefWidth(100);
             ((TableColumn<Mission, String>)stageStatusTable.getColumns().getFirst()).setOnEditCommit(event -> {
@@ -376,6 +415,7 @@ public class FirstForm {
         alert.setHeaderText("Success");
         alert.setContentText("Corrections were made to the save file:\n\n" + String.join("\n", fixes));
         alert.showAndWait();
+        update(mainApp.fs);
     }
 
     @FXML
@@ -472,14 +512,18 @@ public class FirstForm {
     }
 
     private class Mission {
+        private int pages;
+        private int index;
         private String name;
         private String status;
         private String type;
 
-        private Mission(String type, String name, String status) {
+        private Mission(String type, String name, String status, int index, int pages) {
             this.type = type;
             this.name = name;
             this.status = status;
+            this.index = index;
+            this.pages = pages;
         }
 
         public String getName() {
@@ -492,6 +536,14 @@ public class FirstForm {
 
         public String getType() {
             return type;
+        }
+
+        public String getIndex() {
+            return Integer.toString(index);
+        }
+
+        public String getPages() {
+            return Integer.toString(pages);
         }
 
         public void setName(String value) {
@@ -520,6 +572,15 @@ public class FirstForm {
             if (locked) return;
             mainApp.fs.SetMissionType(missionsComboBox.getSelectionModel().getSelectedIndex(), stageStatusTable.getSelectionModel().getSelectedIndex(), value.equals("Red"));
             update(mainApp.fs);
+        }
+
+        public void setIndex(String value) {
+            this.index = Integer.parseInt(value);
+
+        }
+
+        public void setPages(String value) {
+            this.pages = Integer.parseInt(value);
         }
     }
 

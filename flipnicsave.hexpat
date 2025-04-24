@@ -115,9 +115,10 @@ enum SoundMode : u8 {
     Stereo
 };
 
-enum Unlock : u8 {
-    Locked,
-    Unlocked = 0x03
+enum StageCompletion : u8 {
+    NotCompleted,
+    Started,
+    Completed = 0x03
 };
 
 enum Difficulty : u32 {
@@ -132,7 +133,8 @@ struct ScoreRow {
     Difficulty difficulty;
     u32 combos;
     char initials[0x20];
-    padding[8];
+    padding[4];
+    u32 default_score;
 };
 
 struct ScoreBoard {
@@ -171,6 +173,20 @@ struct MissionMap {
     Mission evolutionD[0x20];
 };
 
+struct StageBool {
+    StageCompletion biologyA;
+    StageCompletion evolutionA;
+    StageCompletion metallurgyA;
+    StageCompletion evolutionB;
+    StageCompletion opticsA;
+    StageCompletion evolutionC;
+    StageCompletion biologyB;
+    StageCompletion metallurgyB;
+    StageCompletion opticsB;
+    StageCompletion geometryA;
+    StageCompletion evolutionD;
+};
+
 struct MissionTypes {
     MissionType color[0x20];
 };
@@ -198,8 +214,12 @@ Control right_nudge @ 0x17;
 Control left_flipper @ 0x23;
 Control right_flipper @ 0x19;
 
-Unlock original_unlocks[11] @ 0x274C;
-Unlock freeplay_unlocks[11] @ 0x275C;
+StageBool original_unlocks @ 0x274C;
+StageBool freeplay_unlocks @ 0x275C;
+StageBool last_played_stage @ 0x276C;
+//unsure what this is
+//StageBool finished_bosses @ 0x258C;
+
 u32 mission_rows[11] @ 0x110C;
 
 Ranking ranking @ 0x60;

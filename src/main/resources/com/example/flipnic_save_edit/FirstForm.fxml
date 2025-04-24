@@ -7,7 +7,7 @@
 
 <AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.flipnic_save_edit.FirstForm">
    <children>
-      <TabPane accessibleRoleDescription="Save editor tab navigation panel" accessibleText="Use Control+Tab to navigate between various tabs" layoutX="3.0" layoutY="47.0" prefHeight="400.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <TabPane fx:id="windowTabs" accessibleRoleDescription="Save editor tab navigation panel" accessibleText="Use Control+Tab to navigate between various tabs" disable="true" layoutX="3.0" layoutY="47.0" prefHeight="400.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <tabs>
           <Tab text="Information">
             <content>
@@ -28,7 +28,7 @@
                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                       </rowConstraints>
                       <children>
-                          <Label fx:id="checkSumLabel" accessibleRoleDescription="Checksum value" accessibleText="A unique identifier, for verifying save file integrity" alignment="TOP_LEFT" prefHeight="23.0" prefWidth="291.0" text="No file loaded" textAlignment="CENTER" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                          <Label fx:id="checkSumLabel" accessibleRoleDescription="Checksum value" accessibleText="A unique identifier, for verifying save file integrity" alignment="TOP_LEFT" prefHeight="23.0" prefWidth="291.0" text="No file loaded" textAlignment="CENTER" GridPane.columnIndex="1">
                               <font>
                                   <Font name="Calibri" size="18.0" />
                               </font>
@@ -36,7 +36,7 @@
                                   <Insets left="5.0" />
                               </GridPane.margin>
                           </Label>
-                          <Label alignment="CENTER_RIGHT" prefHeight="21.0" prefWidth="293.0" text="Primary checksum:" GridPane.halignment="RIGHT" GridPane.rowIndex="1">
+                          <Label alignment="CENTER_RIGHT" prefHeight="21.0" prefWidth="293.0" text="Primary checksum:" GridPane.halignment="RIGHT">
                               <font>
                                   <Font name="Calibri" size="17.0" />
                               </font>
@@ -75,28 +75,44 @@
                                  <Insets left="5.0" />
                               </GridPane.margin>
                            </Label>
-                           <Label fx:id="redundantChecksumLabel" accessibleText="Secondary unique identifier used by the game for verifying save file integrity" prefHeight="23.0" prefWidth="291.0" text="No file loaded" GridPane.columnIndex="1">
+                          <Label fx:id="redundantChecksumLabel" accessibleText="Secondary unique identifier used by the game for verifying save file integrity" prefHeight="23.0" prefWidth="291.0" text="No file loaded" GridPane.columnIndex="1" GridPane.rowIndex="1">
                               <font>
-                                 <Font name="Calibri" size="18.0" />
+                                  <Font name="Calibri" size="18.0" />
                               </font>
                               <GridPane.margin>
-                                 <Insets left="5.0" />
+                                  <Insets left="5.0" />
                               </GridPane.margin>
-                           </Label>
-                           <Label text="Redundant checksum:" textAlignment="RIGHT" GridPane.halignment="RIGHT">
+                          </Label>
+                          <Label text="Backup checksum:" textAlignment="RIGHT" GridPane.halignment="RIGHT" GridPane.rowIndex="1">
                               <GridPane.margin>
-                                 <Insets right="5.0" />
+                                  <Insets right="5.0" />
                               </GridPane.margin>
                               <font>
-                                 <Font name="Calibri" size="17.0" />
+                                  <Font name="Calibri" size="17.0" />
                               </font>
-                           </Label>
-                           <Button fx:id="updateSumsButton" accessibleText="Updating checksums ensures that the save file is not seen as corrupted by the game." onAction="#updateChecksums" text="_Update checksums" GridPane.halignment="RIGHT" GridPane.rowIndex="4">
+                          </Label>
+                          <Label alignment="CENTER_RIGHT" prefHeight="21.0" prefWidth="296.0" text="Last stage played:" GridPane.halignment="RIGHT" GridPane.rowIndex="4">
+                              <font>
+                                  <Font name="Calibri" size="17.0" />
+                              </font>
+                              <GridPane.margin>
+                                  <Insets right="5.0" />
+                              </GridPane.margin>
+                          </Label>
+                          <Label fx:id="lastPlayedStageLabel" accessibleText="Last stage that was played with this save file" text="N/A" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                              <font>
+                                  <Font name="Calibri" size="17.0" />
+                              </font>
+                              <GridPane.margin>
+                                  <Insets left="5.0" />
+                              </GridPane.margin>
+                          </Label>
+                           <Button fx:id="updateSumsButton" accessibleText="Updating checksums ensures that the save file is not seen as corrupted by the game." onAction="#updateChecksums" text="_Update checksums" GridPane.halignment="RIGHT" GridPane.rowIndex="5">
                               <GridPane.margin>
                                  <Insets right="5.0" />
                               </GridPane.margin>
                            </Button>
-                           <Button accessibleText="Fix other save file problems, such as the file size, headers and footers, etc." onAction="#applyFixes" text="_Fix save file structure" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                           <Button accessibleText="Fix other save file problems, such as the file size, headers and footers, etc." onAction="#applyFixes" text="Diagnose save _file" GridPane.columnIndex="1" GridPane.rowIndex="5">
                               <GridPane.margin>
                                  <Insets left="5.0" />
                               </GridPane.margin>
@@ -115,7 +131,7 @@
               </AnchorPane>
             </content>
           </Tab>
-          <Tab text="Options">
+          <Tab fx:id="optionTab" text="Options">
               <content>
                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>

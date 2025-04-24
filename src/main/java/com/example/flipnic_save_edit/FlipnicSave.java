@@ -8,6 +8,8 @@ import java.nio.ByteOrder;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
@@ -19,9 +21,9 @@ public class FlipnicSave {
 
     private final String[] gameModes = {"Original game", "Biology A", "Biology B", "Metallurgy A", "Metallurgy B", "Optics A", "Optics B", "Geometry A",
             "Biology A (Time Attack)", "Biology B (Time Attack)", "Metallurgy A (Time Attack)", "Metallurgy B (Time Attack)", "Optics A (Time Attack)", "Optics B (Time Attack)", "Geometry A (Time Attack)"};
-    private final String[] originalModes = {"Biology A", "Evolution A", "Metallurgy A", "Evolution B", "Optics A", "Evolution C", "Biology B", "Metallurgy B", "Optics B", "Geometry A", "Evolution D", "All stages finished"};
+    private String[] originalModes = {"Biology A", "Evolution A", "Metallurgy A", "Evolution B", "Optics A", "Evolution C", "Biology B", "Metallurgy B", "Optics B", "Geometry A", "Evolution D", "All stages finished"};
 
-    private final String[] validStrings = {"ja", "", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "BONUS %dpts", "JACKPOT=%d",
+    private String[] validStrings = {"ja", "", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "BONUS %dpts", "JACKPOT=%d",
             "IN", "%d", "?Go ?Back", "Yes", "No", "CONTINUE?", "RESULT", "FLAMINGO COUNTS", "FLAMINGO BONUS",
             " % d Pts.", " ----- Pts.", "PERFECT BONUS", "TOTAL SCORE", "WHY DON'T YOU", "GET STARS ?", "YOU GET",
             "ALL", "FLAMINGOS!", "%d/10", "COMBO %d", "SLOT CHANCE!", "%d Pts.", "ALIEN HILL !", "GALAXY TENNIS !",
@@ -80,39 +82,69 @@ public class FlipnicSave {
     }
 
     // internal methods
-    private byte ReadByte(int addr) {
-        if (addr >= this.dataList.size()) {
+    private byte ReadByte(int addr, Byte... data) {
+        List<Byte> dataList = this.dataList;
+        if (data.length > 0) dataList = Arrays.stream(data).toList();
+
+        if (addr >= dataList.size()) {
             System.out.println("Offset " + addr + " out of range!");
             return 0x00;
         }
         return dataList.get(addr);
     }
 
-    private byte[] ReadBytes(int addr, int count) {
-        if (addr + count > this.dataList.size()) {
+    private byte[] ReadBytes(int addr, int count, Byte... data) {
+        List<Byte> dataList = this.dataList;
+        if (data.length > 0) dataList = Arrays.stream(data).toList();
+
+        if (addr + count > dataList.size()) {
             System.out.println("Invalid range: " + addr + " to " + (addr+count));
             return new byte[count];
         }
         byte[] returnArray = new byte[count];
         int j = 0;
         for (int i = addr; i < addr + count; i++) {
-            returnArray[j] = this.dataList.get(i);
+            returnArray[j] = dataList.get(i);
             j++;
         }
         return returnArray;
     }
-    private byte[] ReadBytesLE(int addr, int count) {
-        if (addr + count > this.dataList.size()) {
+    private byte[] ReadBytesLE(int addr, int count, Byte... data) {
+        List<Byte> dataList = this.dataList;
+        if (data.length > 0) dataList = Arrays.stream(data).toList();
+
+        if (addr + count > dataList.size()) {
             System.out.println("Invalid range: " + addr + " to " + (addr+count));
             return new byte[count];
         }
         byte[] returnArray = new byte[count];
         int j = 0;
         for (int i = addr + count - 1; i >= addr; i--) {
-            returnArray[j] = this.dataList.get(i);
+            returnArray[j] = dataList.get(i);
             j++;
         }
         return returnArray;
+    }
+
+    private byte[] ReverseArray(byte[] array) {
+        // Initialize left to the beginning and right to the end
+        int left = 0, right = array.length - 1;
+
+        // Iterate till left is less than right
+        while (left < right) {
+
+            // Swap the elements at left and right position
+            byte temp = array[left];
+            array[left] = array[right];
+            array[right] = temp;
+
+            // Increment the left pointer
+            left++;
+
+            // Decrement the right pointer
+            right--;
+        }
+        return array;
     }
 
     private void WriteByte(int addr, byte value) {
@@ -169,7 +201,6 @@ public class FlipnicSave {
             return "(null)";
         }
     }
-
 
     // general methods with abstraction layer
 
@@ -272,6 +303,26 @@ public class FlipnicSave {
         } else {
             return "Out of range";
         }
+    }
+
+    public String GetLastPlayedStage() {
+        boolean started = false;
+        String stgName = "N/A";
+        int i = 0;
+        for (int offset = 0x276C; offset < 0x2778; offset++) {
+            byte cByte = ReadByte(offset);
+            if (cByte > 0x00) {
+                started = cByte == 1;
+                stgName = originalModes[i];
+                break;
+            }
+            i++;
+        }
+        if (!stgName.equals("N/A")) {
+            if (started) return stgName + " (Started)";
+            else return stgName + " (Completed)";
+        }
+        return stgName;
     }
 
     public void SetCurrentStage(int value) {
@@ -555,6 +606,71 @@ public class FlipnicSave {
 
     }
 
+    public String[] getStageDirs() {
+        List<String> dirs = new ArrayList<>();
+        for (int offset = 4300; offset < 4344; offset+=4)
+            dirs.add(stageDir[ByteBuffer.wrap(ReadBytesLE(offset, 4)).getInt()]);
+        return dirs.toArray(new String[0]);
+    }
+
+    public void setStageDir(int idx, int value) {
+        WriteByte(4300+(byte)(idx*4), (byte)value);
+    }
+
+    public String[] allStageDirs() {
+        return this.stageDir;
+    }
+
+    public void ToggleJpNames(boolean enabled) {
+        List<String> originalModes = new ArrayList<>(Arrays.stream(this.originalModes).toList());
+        originalModes.replaceAll(s -> s.replace(enabled ? "Evolution" : "Theology", enabled ? "Theology" : "Evolution"));
+        this.originalModes = originalModes.toArray(new String[0]);
+    }
+
+    public boolean ImportMessageFile(String path) throws IOException {
+        // verify magic
+        byte[] fileData = Files.readAllBytes(Path.of(path));
+        byte[] reference = HexFormat.of().parseHex("46706e4d73673030");
+        byte[] actual = Arrays.copyOfRange(fileData, 0x00, 0x08);
+        if (!Arrays.equals(reference, actual)) return false;
+        // determine TOC offsets
+        int tocStart = ByteBuffer.wrap(this.ReverseArray(Arrays.copyOfRange(fileData, 0x08, 0x0C))).getInt();
+        int tocEnd = ByteBuffer.wrap(this.ReverseArray(Arrays.copyOfRange(fileData, 0x0C, 0x10))).getInt() * 8 + tocStart;
+        // process data
+        byte[] toc = Arrays.copyOfRange(fileData, tocStart, tocEnd);
+        List<String> validStrings = new ArrayList<>();
+        for (int offset = 0; offset < tocEnd - tocStart; offset+=8) {
+            int stringOffset = ByteBuffer.wrap(this.ReverseArray(Arrays.copyOfRange(toc, offset, offset+4))).getInt();
+            short charsCnt = ByteBuffer.wrap(this.ReverseArray(Arrays.copyOfRange(toc, offset+4, offset+6))).getShort();
+            validStrings.add(new String(Arrays.copyOfRange(fileData, stringOffset, stringOffset + charsCnt), StandardCharsets.UTF_16LE));
+        }
+        this.validStrings = validStrings.toArray(new String[0]);
+        return true;
+    }
+
+    public int[] GetMissionIndicies(int idx) {
+        int[] indicies = new int[0x20];
+        int i = 0;
+        for (int offset = 0x1D4C + (idx * 0x20); offset < 0x1D4C + (idx * 0x20) + 0x20; offset++) {
+            indicies[i] = ReadByte(offset);
+            i++;
+        }
+        return indicies;
+    }
+
+    public int[] GetMissionPages(int idx) {
+        int[] pages = new int[0x20];
+        int i = 0;
+        for (int offset = 0x1F4C + (idx * 0x20); offset < 0x1F4C + (idx * 0x20) + 0x20; offset++) {
+            pages[i] = ReadByte(offset);
+            i++;
+        }
+        return pages;
+    }
+
+
+    // diagnostics
+
     public String[] FixStructure() {
         List<String> fixes = new ArrayList<>();
         if (SizeFix()) fixes.add("Save size fix");
@@ -607,18 +723,12 @@ public class FlipnicSave {
         return true;
     }
 
-    public String[] getStageDirs() {
-        List<String> dirs = new ArrayList<>();
-        for (int offset = 4300; offset < 4344; offset+=4)
-            dirs.add(stageDir[ByteBuffer.wrap(ReadBytesLE(offset, 4)).getInt()]);
-        return dirs.toArray(new String[0]);
-    }
 
-    public void setStageDir(int idx, int value) {
-        WriteByte(4300+(byte)(idx*4), (byte)value);
-    }
-
-    public String[] allStageDirs() {
-        return this.stageDir;
+    public int GetExpectedCount() {
+        int expected = 0;
+        for (int offset = 0x110C; offset < 0x110C+0x2C; offset+=4) {
+            expected += ByteBuffer.wrap(this.ReadBytesLE(offset, 4)).getInt();
+        }
+        return expected;
     }
 }

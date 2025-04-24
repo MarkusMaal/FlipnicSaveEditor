@@ -5,22 +5,23 @@
 
 <BorderPane fx:id="borderPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.flipnic_save_edit.RootLayout">
    <top>
-      <MenuBar accessibleRoleDescription="Primary menu bar" BorderPane.alignment="CENTER">
-        <menus>
-          <Menu mnemonicParsing="false" text="File">
-            <items>
-                  <MenuItem mnemonicParsing="false" onAction="#onOpenFile" text="Open..." />
-                  <MenuItem mnemonicParsing="false" onAction="#onSaveAsFile" text="Save as..." />
-                  <MenuItem mnemonicParsing="false" onAction="#onSaveFile" text="Save" />
-              <MenuItem mnemonicParsing="false" onAction="#onCloseApp" text="Close" />
-            </items>
-          </Menu>
-          <Menu mnemonicParsing="false" text="Help">
-            <items>
-              <MenuItem mnemonicParsing="false" onAction="#onAboutClicked" text="About" />
-            </items>
-          </Menu>
-        </menus>
-      </MenuBar>
+       <MenuBar accessibleRoleDescription="Primary menu bar" BorderPane.alignment="CENTER">
+           <Menu text="Fil_e">
+               <MenuItem onAction="#onOpenFile" text="_Open..." />
+               <MenuItem onAction="#onSaveAsFile" text="Save _as..." />
+               <MenuItem onAction="#onSaveFile" text="_Save" />
+               <MenuItem onAction="#onCloseApp" text="_Close" />
+           </Menu>
+           <Menu text="Option_s">
+               <CheckMenuItem fx:id="regionCheck" onAction="#ToggleRegion" text="Use NTSC-_J stage names" />
+               <CheckMenuItem onAction="#ToggleDark" text="_Dark theme" />
+               <MenuItem onAction="#ImportMsgFile" text="_Import JA.MSG file (fix wrong missions)" />
+           </Menu>
+           <Menu text="Hel_p">
+            <MenuItem onAction="#ShowFaq" text="_FAQ" />
+               <MenuItem onAction="#ShowDisclaimer" text="_Disclaimer" />
+               <MenuItem onAction="#onAboutClicked" text="_About" />
+           </Menu>
+       </MenuBar>
    </top>
 </BorderPane>

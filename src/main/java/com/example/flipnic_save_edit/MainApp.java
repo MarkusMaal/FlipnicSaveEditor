@@ -25,9 +25,13 @@ public class MainApp extends Application {
     public FlipnicSave fs = new FlipnicSave(new byte[0]);
     public FirstForm mainWindow;
 
-    public String version = "0.6";
+    public Scene rootScene;
+    public FirstForm controller;
+
+    public String version = "0.7";
     public String savePath = "";
-    public final static String[] friendlyStageNames = "Biology A,Evolution A,Metallurgy A,Evolution B,Optics A,Evolution C,Biology B,Metallurgy B,Optics B,Geometry A,Evolution D".split(",");
+    public static String[] friendlyStageNames = "Biology A,Evolution A,Metallurgy A,Evolution B,Optics A,Evolution C,Biology B,Metallurgy B,Optics B,Geometry A,Evolution D".split(",");
+    public static boolean darkMode = false;
 
 
     @Override
@@ -47,8 +51,8 @@ public class MainApp extends Application {
     public void initRootLayout() throws IOException {
         FXMLLoader loader = initLayout("RootLayout.fxml");
         rootLayout = (BorderPane) loader.load();
-        Scene scene = new Scene(rootLayout);
-        primaryStage.setScene(scene);
+        rootScene = new Scene(rootLayout);
+        primaryStage.setScene(rootScene);
         RootLayout controller = loader.getController();
         controller.setMainApp(this);
         primaryStage.show();
@@ -58,7 +62,7 @@ public class MainApp extends Application {
         FXMLLoader loader = initLayout("FirstForm.fxml");
         AnchorPane firstForm = (AnchorPane) loader.load();
 
-        FirstForm controller = loader.getController();
+        controller = loader.getController();
         this.mainWindow = controller;
         controller.setMainApp(this);
         rootLayout.setCenter(firstForm);
@@ -106,11 +110,11 @@ public class MainApp extends Application {
             for (int i = 0; i < 11; i++) {
                 totalMissions += this.fs.GetMissions(i).length;
             }
-            if (totalMissions != 115) {
+            if (totalMissions != this.fs.GetExpectedCount()) {
                 Alert alert = new Alert(Alert.AlertType.WARNING);
                 alert.setTitle("Stage status invalid");
                 alert.setHeaderText("Mission data may be corrupted");
-                alert.setContentText("Abnormal amount of missions detected: expected 115, actual " + totalMissions + "\nThis save file may be modified");
+                alert.setContentText("Abnormal amount of missions detected: expected " + this.fs.GetExpectedCount() + ", actual " + totalMissions + "\nThis save file may be modified");
                 alert.showAndWait();
             }
             mainWindow.update(this.fs);
