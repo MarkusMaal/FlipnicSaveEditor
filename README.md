@@ -91,13 +91,13 @@ You can use this tab to quickly toggle on/off unlocked stages in both original g
 
 ![Unlocks](img/unlocks.png)
 
-This can be useful if you want to quickly play later stages without or if you want to re-lock free play stages, as you normally can't do that without creating a new save file.  The game normally duplicates the state of original game, but when you use the "retry" option in-game, it only resets the original game unlocks.
+This can be useful if you want to quickly play later stages without having to complete the earlier ones or if you want to re-lock free play stages, as you normally can't do that without creating a new save file. The game normally duplicates the state of original game, but when you use the "retry" option in-game, it only resets the original game unlocks.
 
 You can also force score mode on a specific stage, which allows you to play with score enabled on a previously cleared stage.
 
 ### Mission hacking
 
-With the "Missions" tab you can toggle the status of missions, which is something you'd expect to be possible, but there's way more stuff you can modify within the save file that normally isn't possible.
+With the "Missions" tab you can toggle the status of missions (Not complete, Started, Completed), which is something you'd expect to be possible, but there's way more stuff you can modify within the save file that normally isn't possible.
 
 ![Missions tab](img/mission.png)
 
@@ -153,7 +153,7 @@ You may also notice that if you go to missions tab, the names of all the mission
 
 # Creating hybrid saves
 
-You can transfer parts from one save to another creating so-called "hybrid" stages. First open the save file you want the specific section exported from. Then click on one of these menu options:
+You can transfer parts from one save to another creating so-called "hybrid" saves. First open the save file you want the specific section exported from. Then click on one of these menu options:
 
 ![Export menu](img/menu_export.png)
 
@@ -167,7 +167,7 @@ You know the import worked if primary and backup checksum become invalid. Simply
 
 # Hex pattern file
 
-If you want to manually explore Flipnic save files with a hex editor that supports hexpat files, such as ImHex, you can import the [flipnicsave.hexpat](flipnicsave.hexpat) to get highlighting for what various bytes within the save file do.
+If you want to manually explore Flipnic save files with a hex editor that supports hexpat files, such as ImHex, you can import the [flipnicsave.hexpat](flipnicsave.hexpat) pattern file to get highlighting for what various bytes within the save file do.
 
 ![ImHex pattern](img/hexpat.png)
 
