@@ -3,23 +3,40 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane fx:id="borderPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.flipnic_save_edit.RootLayout">
+<BorderPane fx:id="borderPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="650.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.flipnic_save_edit.RootLayout">
    <top>
        <MenuBar accessibleRoleDescription="Primary menu bar" BorderPane.alignment="CENTER">
            <Menu text="Fil_e">
                <MenuItem onAction="#onOpenFile" text="_Open..." />
-               <MenuItem onAction="#onSaveAsFile" text="Save _as..." />
                <MenuItem onAction="#onSaveFile" text="_Save" />
-               <MenuItem onAction="#onCloseApp" text="_Close" />
+               <MenuItem onAction="#onSaveAsFile" text="Save _as..." />
+            <SeparatorMenuItem mnemonicParsing="false" />
+               <Menu fx:id="importMenu" disable="true" text="_Import..">
+                   <MenuItem mnemonicParsing="false" onAction="#ImportData" text="Ranking" />
+                   <MenuItem mnemonicParsing="false" onAction="#ImportData" text="Options" />
+                   <MenuItem mnemonicParsing="false" onAction="#ImportData" text="Missions" />
+                   <MenuItem mnemonicParsing="false" onAction="#ImportData" text="Unlocks" />
+                   <MenuItem mnemonicParsing="false" onAction="#ImportData" text="Stages" />
+               </Menu>
+               <Menu fx:id="exportMenu" disable="true" text="E_xport...">
+                   <MenuItem mnemonicParsing="false" onAction="#ExportData" text="Ranking" />
+                   <MenuItem mnemonicParsing="false" onAction="#ExportData" text="Options" />
+                   <MenuItem mnemonicParsing="false" onAction="#ExportData" text="Missions" />
+                   <MenuItem mnemonicParsing="false" onAction="#ExportData" text="Unlocks" />
+                   <MenuItem mnemonicParsing="false" onAction="#ExportData" text="Stages" />
+               </Menu>
+            <SeparatorMenuItem mnemonicParsing="false" />
+               <MenuItem onAction="#onCloseApp" text="_Quit" />
            </Menu>
            <Menu text="Option_s">
-               <CheckMenuItem fx:id="regionCheck" onAction="#ToggleRegion" text="Use NTSC-_J stage names" />
+               <CheckMenuItem fx:id="regionCheck" disable="true" onAction="#ToggleRegion" text="Use NTSC-_J stage names" />
                <CheckMenuItem onAction="#ToggleDark" text="_Dark theme" />
-               <MenuItem onAction="#ImportMsgFile" text="_Import JA.MSG file (fix wrong missions)" />
+               <MenuItem fx:id="importMsgMenuItem" disable="true" onAction="#ImportMsgFile" text="_Import JA.MSG file (fix wrong missions)" />
            </Menu>
            <Menu text="Hel_p">
             <MenuItem onAction="#ShowFaq" text="_FAQ" />
                <MenuItem onAction="#ShowDisclaimer" text="_Disclaimer" />
+            <SeparatorMenuItem mnemonicParsing="false" />
                <MenuItem onAction="#onAboutClicked" text="_About" />
            </Menu>
        </MenuBar>

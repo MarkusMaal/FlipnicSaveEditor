@@ -39,7 +39,6 @@ public class FlipnicSave {
             "CRAB BABY SHOOT-DOWN", "POINT OF NO RETURN 1", "POINT OF NO RETURN 2", "POINT OF NO RETURN 3", "LOOP THE LOOP 1", "LOOP THE LOOP 2",
             "LOOP THE LOOP 3", "CHU CHU MULTIBALL", "SPACE WARP", "ALIEN HILL", "AREA 74", "GALAXY TENNIS", "100 BLOCKS", "WARM-COLORED BLOCKS"};
     private static String[] inputs = {"L2", "R2", "L1", "R1", "Triangle", "Circle", "Cross", "Square", "Unknown 8", "Unknown 9", "Unknown A", "Unknown B", "DPad Up", "DPad Right", "DPad Down", "DPad Left"};
-    private final int[] missionOffsets = {0x114C, 0x124C, 0x134C, 0x144C, 0x14CC, 0x154C, 0x15CC};
     private String[] stageDir = {"JUNGLE1", "ISEKI1", "BOSS1", "RETRO1", "HIKARI1", "DEMO1", "JUNGLE2", "ISEKI2", "HIKARI2", "VS1", "VS2", "VS3", "VS4", "BOSS2", "BOSS3", "BOSS4"};
 
     public enum Options {
@@ -77,8 +76,12 @@ public class FlipnicSave {
         }
     }
 
-    public List<Byte> Read() {
-        return this.dataList;
+    public byte[] Read() {
+        byte[] saveData = new byte[this.dataList.size()];
+        for (int i = 0; i < this.dataList.size(); i++) {
+            saveData[i] = this.dataList.get(i);
+        }
+        return saveData;
     }
 
     // internal methods
@@ -250,8 +253,6 @@ public class FlipnicSave {
             decoded.append(byteToHex(rawChecksum[i]));
             decodedOnline.append(byteToHex(onlineChecksum[i]));
         }
-        System.out.println("Offline checksum: " + decoded.toString().toUpperCase());
-        System.out.println("Online checksum: " + decodedOnline.toString().toUpperCase());
         return decoded.toString().toUpperCase();
     }
 
@@ -388,7 +389,7 @@ public class FlipnicSave {
             case 2 -> "Hard";
             default -> "(null)";
         };
-        return ((rank) + ";" + initials + ";" + scoreVal + ";" + combos + ";" + offset + ";" + difficulty + ";" + gameModes[modeIdx]).split(";", 0);
+        return ((rank) + ";" + initials + ";" + scoreVal + ";" + combos + ";0x" + Integer.toHexString(offset) + ";" + difficulty + ";" + gameModes[modeIdx]).split(";", 0);
     }
 
     // options
@@ -475,7 +476,6 @@ public class FlipnicSave {
 
     public String[] GetMissionTypes(int idx) {
         try {
-            System.out.println(0x194C + (idx * 0x40));
             if (0x194C + (idx * 0x64) >= this.dataList.size()) {
                 return new String[0];
             } else {
@@ -486,10 +486,8 @@ public class FlipnicSave {
                     try {
                         if (ReadByte(offset) > 0) {
                             types.add("Red");
-                            System.out.print("RED " + offset + " ");
                         } else {
                             types.add("Yellow");
-                            System.out.print("YELLOW " + offset + " ");
                         }
                     } catch (Exception ex) {
                         types.add("Invalid");
@@ -666,6 +664,16 @@ public class FlipnicSave {
             i++;
         }
         return pages;
+    }
+
+    public void SetMissionPages(int stage, int row, int value) {
+        int offset = 0x1F4C + (stage * 0x20) + row;
+        WriteByte(offset, (byte)value);
+    }
+
+    public void SetMissionIndex(int stage, int row, int value) {
+        int offset = 0x1D4C + (stage * 0x20) + row;
+        WriteByte(offset, (byte)value);
     }
 
 

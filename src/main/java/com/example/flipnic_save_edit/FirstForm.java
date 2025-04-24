@@ -9,6 +9,9 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.input.TransferMode;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -66,18 +69,6 @@ public class FirstForm {
 
     @FXML
     private TableView<ScoreRow> rankingTable;
-
-    @FXML
-    private TableColumn<ScoreRow, String> rankColumn;
-
-    @FXML
-    private TableColumn<ScoreRow, String> scoreColumn;
-
-    @FXML
-    private TableColumn<ScoreRow, String> initialsColumn;
-
-    @FXML
-    private TableColumn<ScoreRow, String> combosColumn;
 
     // unlocks
     private final ToggleGroup grp = new ToggleGroup();
@@ -258,6 +249,7 @@ public class FirstForm {
             StageRow sr = event.getTableView().getItems().get(event.getTablePosition().getRow());
             sr.setValue(event.getNewValue());
         });
+        DisableTableSorting(stageDirTable.getColumns());
     }
 
     @SuppressWarnings("unchecked")
@@ -289,7 +281,7 @@ public class FirstForm {
             stageStatusTable.getColumns().add(column("Mission", Mission::getName));
             stageStatusTable.getColumns().add(column("Status", Mission::getStatus));
             stageStatusTable.getColumns().add(column("Index", Mission::getIndex));
-            stageStatusTable.getColumns().add(column("Page count", Mission::getPages));
+            stageStatusTable.getColumns().add(column("Pages", Mission::getPages));
             ((TableColumn<Mission, String>)stageStatusTable.getColumns().getFirst()).setCellFactory(ComboBoxTableCell.forTableColumn(new String[]{"Red", "Yellow"}));
             ((TableColumn<Mission, String>)stageStatusTable.getColumns().getFirst()).setPrefWidth(100);
             ((TableColumn<Mission, String>)stageStatusTable.getColumns().getFirst()).setOnEditCommit(event -> {
@@ -308,9 +300,27 @@ public class FirstForm {
                 Mission m = event.getTableView().getItems().get(event.getTablePosition().getRow());
                 m.setStatus(event.getNewValue());
             });
+            ((TableColumn<Mission, String>)stageStatusTable.getColumns().get(3)).setCellFactory(TextFieldTableCell.forTableColumn());
+            ((TableColumn<Mission, String>)stageStatusTable.getColumns().get(3)).setOnEditCommit(event -> {
+                Mission m = event.getTableView().getItems().get(event.getTablePosition().getRow());
+                m.setIndex(event.getNewValue());
+            });
+            ((TableColumn<Mission, String>)stageStatusTable.getColumns().get(4)).setCellFactory(TextFieldTableCell.forTableColumn());
+            ((TableColumn<Mission, String>)stageStatusTable.getColumns().get(4)).setOnEditCommit(event -> {
+                Mission m = event.getTableView().getItems().get(event.getTablePosition().getRow());
+                m.setPages(event.getNewValue());
+            });
+            DisableTableSorting(stageStatusTable.getColumns());
         } else {
             stageStatusTable.getItems().clear();
             stageStatusTable.getColumns().clear();
+        }
+    }
+
+    private void DisableTableSorting(ObservableList<String> columns) {
+        for (Object tc : columns) {
+            TableColumn<Mission, String> atc = (TableColumn<Mission, String>) tc;
+            atc.setSortable(false);
         }
     }
 
@@ -361,6 +371,7 @@ public class FirstForm {
         rankingTable.getColumns().add(column("Offset", ScoreRow::getOffset));
         int i = 0;
         for (TableColumn tc : rankingTable.getColumns()) {
+            tc.setSortable(false);
             if (i == rankingTable.getColumns().size() - 1) {
                 break;
             }
@@ -404,14 +415,14 @@ public class FirstForm {
         String[] fixes = mainApp.fs.FixStructure();
         if (fixes.length == 0) {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Fix file structure");
+            alert.setTitle("Diagnose save file");
             alert.setHeaderText("No fixes were applied");
             alert.setContentText("Your save file appears to have the correct structure");
             alert.showAndWait();
             return;
         }
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Fix file structure");
+        alert.setTitle("Diagnose save file");
         alert.setHeaderText("Success");
         alert.setContentText("Corrections were made to the save file:\n\n" + String.join("\n", fixes));
         alert.showAndWait();
@@ -477,6 +488,12 @@ public class FirstForm {
         });
         return col ;
     }
+
+    public void DragDetect(MouseEvent mouseEvent) {
+        int dummy = 1;
+
+    }
+
     public static class Model {
         private List<ScoreRow> items ;
 
@@ -575,12 +592,27 @@ public class FirstForm {
         }
 
         public void setIndex(String value) {
-            this.index = Integer.parseInt(value);
-
+            try {
+                this.index = Integer.parseInt(value);
+            } catch (NumberFormatException e) {
+                update(mainApp.fs);
+                return;
+            }
+            if (locked) return;
+            mainApp.fs.SetMissionIndex(missionsComboBox.getSelectionModel().getSelectedIndex(), stageStatusTable.getSelectionModel().getSelectedIndex(), this.index);
+            update(mainApp.fs);
         }
 
         public void setPages(String value) {
-            this.pages = Integer.parseInt(value);
+            try {
+                this.pages = Integer.parseInt(value);
+            } catch (NumberFormatException e) {
+                update(mainApp.fs);
+                return;
+            }
+            if (locked) return;
+            mainApp.fs.SetMissionPages(missionsComboBox.getSelectionModel().getSelectedIndex(), stageStatusTable.getSelectionModel().getSelectedIndex(), this.pages);
+            update(mainApp.fs);
         }
     }
 

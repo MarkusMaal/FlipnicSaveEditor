@@ -2,9 +2,10 @@ package com.example.flipnic_save_edit;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.CheckMenuItem;
+import javafx.scene.control.*;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
 
@@ -13,7 +14,11 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 
 public class RootLayout {
+    private String originalTitle;
     public CheckMenuItem regionCheck;
+    public Menu importMenu;
+    public Menu exportMenu;
+    public MenuItem importMsgMenuItem;
     @FXML
     private BorderPane borderPane;
 
@@ -26,7 +31,33 @@ public class RootLayout {
 
     @FXML
     private void initialize() {
-
+        borderPane.setOnDragOver(event -> {
+            if (event.getGestureSource() != borderPane
+                    && event.getDragboard().hasFiles()) {
+                event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+            }
+            event.consume();
+            if (originalTitle == null) originalTitle = mainApp.primaryStage.getTitle();
+            mainApp.primaryStage.setTitle("Drop here to load!");
+        });
+        borderPane.setOnDragExited(event -> {
+            mainApp.primaryStage.setTitle(originalTitle);
+            event.consume();
+        });
+        borderPane.setOnDragDropped(event -> {
+            mainApp.primaryStage.setTitle(originalTitle);
+            Dragboard db = event.getDragboard();
+            boolean success = false;
+            if (db.hasFiles()) {
+                success = true;
+                File f = db.getFiles().getFirst();
+                LoadFile(f);
+                mainApp.primaryStage.setTitle("Flipnic Save Editor " + mainApp.version +  " - " + f.getName());
+                originalTitle = mainApp.primaryStage.getTitle();
+            }
+            event.setDropCompleted(success);
+            event.consume();
+        });
     }
 
     @FXML
@@ -41,9 +72,23 @@ public class RootLayout {
         fileChooser.getExtensionFilters().add(extFilter);
 
         File file = fileChooser.showOpenDialog(mainApp.getPrimaryStage());
+        LoadFile(file);
+    }
 
+    private void LoadFile(File file) {
         if (file != null) {
             mainApp.loadFile(file);
+            importMenu.setDisable(false);
+            exportMenu.setDisable(false);
+            importMsgMenuItem.setDisable(false);
+            regionCheck.setDisable(false);
+            if (file.getName().equals("BISCPS-15050")) {
+                regionCheck.setSelected(true);
+                ToggleRegion();
+            } else {
+                regionCheck.setSelected(false);
+                ToggleRegion();
+            }
         }
     }
 
@@ -238,5 +283,64 @@ public class RootLayout {
         If you use ImHex, you can right click on the "Pattern editor" section of the window and select "Import Pattern File..." from the popup menu. Then import the "flipnicsave.hexpat" file from the root directory on FlipnicSaveEditor repository (git clone source tree first).
         """);
         alert.showAndWait();
+    }
+
+    private void TransferData(String kind, File file, boolean export) {
+
+        TransferUtil tu = new TransferUtil(mainApp.fs.Read(), file.toPath(), export);
+        try {
+            switch (kind) {
+                case "Ranking":
+                    tu.TransferRanks();
+                    break;
+                case "Missions":
+                    tu.TransferMissions();
+                    break;
+                case "Options":
+                    tu.TransferOptions();
+                    break;
+                case "Unlocks":
+                    tu.TransferUnlocks();
+                    break;
+                case "Stages":
+                    tu.TransferStages();
+                    break;
+                default:
+                    break;
+            }
+            if (!export) {
+                mainApp.fs = new FlipnicSave(tu.GetData());
+                mainApp.controller.update(mainApp.fs);
+            }
+        } catch (IOException e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Import data");
+            alert.setHeaderText("Failed to import data");
+            alert.setContentText("Error: " + e.getMessage());
+            alert.showAndWait();
+        }
+    }
+
+
+
+    public void ImportData(ActionEvent actionEvent) {
+        MenuItem mi = (MenuItem)actionEvent.getSource();
+
+        FileChooser fileChooser = new FileChooser();
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Binary data", "*");
+        fileChooser.getExtensionFilters().add(extFilter);
+
+        File file = fileChooser.showOpenDialog(mainApp.getPrimaryStage());
+        TransferData(mi.getText(), file, false);
+    }
+    public void ExportData(ActionEvent actionEvent) {
+        MenuItem mi = (MenuItem)actionEvent.getSource();
+
+        FileChooser fileChooser = new FileChooser();
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Binary data", "*");
+        fileChooser.getExtensionFilters().add(extFilter);
+
+        File file = fileChooser.showSaveDialog(mainApp.getPrimaryStage());
+        TransferData(mi.getText(), file, true);
     }
 }

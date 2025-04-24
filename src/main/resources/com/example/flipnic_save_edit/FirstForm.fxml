@@ -7,7 +7,7 @@
 
 <AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.flipnic_save_edit.FirstForm">
    <children>
-      <TabPane fx:id="windowTabs" accessibleRoleDescription="Save editor tab navigation panel" accessibleText="Use Control+Tab to navigate between various tabs" disable="true" layoutX="3.0" layoutY="47.0" prefHeight="400.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <TabPane fx:id="windowTabs" accessibleRoleDescription="Save editor tab navigation panel" accessibleText="Use Control+Tab to navigate between various tabs" layoutX="3.0" layoutY="47.0" onDragDetected="#DragDetect" prefHeight="400.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <tabs>
           <Tab text="Information">
             <content>

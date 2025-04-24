@@ -8,8 +8,13 @@ import javafx.scene.control.Alert;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -18,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainApp extends Application {
-    private Stage primaryStage;
+    public Stage primaryStage;
     private BorderPane rootLayout;
 
     public byte[] rawData = new byte[0];
@@ -28,18 +33,25 @@ public class MainApp extends Application {
     public Scene rootScene;
     public FirstForm controller;
 
-    public String version = "0.7";
+    public String version;
     public String savePath = "";
     public static String[] friendlyStageNames = "Biology A,Evolution A,Metallurgy A,Evolution B,Optics A,Evolution C,Biology B,Metallurgy B,Optics B,Geometry A,Evolution D".split(",");
     public static boolean darkMode = false;
 
 
     @Override
-    public void start(Stage stage) throws IOException {
+    public void start(Stage stage) throws IOException, XmlPullParserException {
+        GetVersion();
         this.primaryStage = stage;
         this.primaryStage.setTitle("Flipnic Save Editor " + this.version);
         initRootLayout();
         showFirstForm();
+    }
+
+    private void GetVersion() throws IOException, XmlPullParserException {
+        MavenXpp3Reader reader = new MavenXpp3Reader();
+        Model model = reader.read(new FileReader("pom.xml"));
+        version = model.getVersion();
     }
 
     private FXMLLoader initLayout(String resource) {
@@ -99,12 +111,13 @@ public class MainApp extends Application {
                 alert.setContentText("The save file may be corrupt");
                 alert.showAndWait();
             }
+            /*
             if (!fs.isValidHeader()) {
                 Alert alert = new Alert(Alert.AlertType.WARNING);
                 alert.setTitle("Header mismatch");
                 alert.setHeaderText("File header is not correct, but nobody cares");
                 alert.showAndWait();
-            }
+            }*/
             primaryStage.setTitle("Flipnic Save Editor " + this.version + " - " + saveFile.getName());
             int totalMissions = 0;
             for (int i = 0; i < 11; i++) {
