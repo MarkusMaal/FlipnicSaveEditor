@@ -236,8 +236,8 @@
             <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                        <RadioButton fx:id="originalRad" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#onGameModeChanged" selected="true" text="Original game" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
-                        <RadioButton fx:id="freeRad" layoutX="130.0" layoutY="14.0" mnemonicParsing="false" onAction="#onGameModeChanged" text="Free play" AnchorPane.leftAnchor="120.0" AnchorPane.topAnchor="10.0">
+                        <RadioButton fx:id="originalRad" accessibleRoleDescription="View unlocks for original game mode" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#onGameModeChanged" selected="true" text="Original game" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
+                        <RadioButton fx:id="freeRad" accessibleRoleDescription="View unlocks for free play mode" layoutX="130.0" layoutY="14.0" mnemonicParsing="false" onAction="#onGameModeChanged" text="Free play" AnchorPane.leftAnchor="120.0" AnchorPane.topAnchor="10.0">
                            <padding>
                               <Insets left="10.0" />
                            </padding></RadioButton>
@@ -259,12 +259,12 @@
                         </FlowPane>
                         <Button accessibleRoleDescription="Reset progress" accessibleText="Reset all unlocks for selected game type" layoutX="534.0" layoutY="6.0" onAction="#resetButton" text="_Reset" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
                          <FlowPane alignment="BOTTOM_LEFT" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="150.0">
-                             <CheckBox fx:id="forceStageCheckbox" mnemonicParsing="false" onAction="#updateForcedStage" text="Force score mode">
+                             <CheckBox fx:id="forceStageCheckbox" accessibleText="Force enable score mode for a specific stage in original game that is already completed." mnemonicParsing="false" onAction="#updateForcedStage" text="Force score mode">
                                 <FlowPane.margin>
                                     <Insets left="5.0" top="5.0" />
                                 </FlowPane.margin>
                              </CheckBox>
-                             <ComboBox fx:id="forceStageCombobox" onAction="#updateForcedStage" prefHeight="26.0" prefWidth="207.0">
+                             <ComboBox fx:id="forceStageCombobox" accessibleRoleDescription="List of original game stages" onAction="#updateForcedStage" prefHeight="26.0" prefWidth="207.0">
                                 <FlowPane.margin>
                                     <Insets left="15.0" top="5.0" />
                                 </FlowPane.margin>
@@ -277,7 +277,7 @@
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                     <ComboBox fx:id="missionsComboBox" accessibleRoleDescription="Stage name" layoutX="14.0" layoutY="14.0" onAction="#onMissionStageChanged" prefHeight="25.0" prefWidth="575.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
                     <Label fx:id="missionsLabel" layoutX="14.0" layoutY="46.0" text="Nothing to show here..." AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="50.0" />
-                    <TableView fx:id="stageStatusTable" editable="true" layoutX="10.0" layoutY="43.0" prefHeight="322.0" prefWidth="578.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="50.0">
+                    <TableView fx:id="stageStatusTable" accessibleRoleDescription="List of missions" editable="true" layoutX="10.0" layoutY="43.0" prefHeight="322.0" prefWidth="578.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="50.0">
                         <columns>
                             <TableColumn prefWidth="75.0" text="Type" />
                             <TableColumn prefWidth="437.0" text="Mission" />
