@@ -1,7 +1,6 @@
 package com.example.flipnic_save_edit;
 
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.application.Application;
 import javafx.beans.value.ObservableValueBase;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -9,12 +8,11 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.scene.input.Dragboard;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.input.TransferMode;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -164,6 +162,7 @@ public class FirstForm {
         evoCCheck.setText(regionJp ? "Theology C" : "Evolution C");
         evoDCheck.setText(regionJp ? "Theology D" : "Evolution D");
         optionTab.setText(regionJp ? "Option" : "Options");
+        ReselectCombobox();
     }
 
     private static MainApp mainApp;
@@ -265,7 +264,7 @@ public class FirstForm {
             int[] indicies = mainApp.fs.GetMissionIndicies(statusIdx);
             int[] pages = mainApp.fs.GetMissionPages(statusIdx);
             int i = 0;
-            if (missions.isEmpty()) {
+            if (missions.isEmpty() || (statusIdx == -1)) {
                 return;
             }
             for (String mission: this.missions.get(statusIdx)) {
@@ -353,6 +352,7 @@ public class FirstForm {
     @FXML
     private void onChangeMode() {
         int modeIdx = (gameModeSelector.getSelectionModel().getSelectedIndex()) * 5;
+        if (modeIdx < 0) return;
         rankingTable.getItems().clear();
         rankingTable.getColumns().clear();
         Model model = new Model();
@@ -489,9 +489,12 @@ public class FirstForm {
         return col ;
     }
 
-    public void DragDetect(MouseEvent mouseEvent) {
-        int dummy = 1;
-
+    @FXML
+    public void ReselectCombobox() {
+        missionsComboBox.getSelectionModel().select(-1);
+        missionsComboBox.getSelectionModel().select(0);
+        gameModeSelector.getSelectionModel().select(-1);
+        gameModeSelector.getSelectionModel().select(0);
     }
 
     public static class Model {
@@ -742,6 +745,19 @@ public class FirstForm {
             if (locked) return;
             mainApp.fs.SetScore(gameModeSelector.getSelectionModel().getSelectedIndex(), rankingTable.getSelectionModel().getSelectedIndex(), Integer.parseInt(getScore()), getInitials(), Integer.parseInt(getCombos()), diff);
             update(mainApp.fs);
+        }
+    }
+
+    public void SetParameters(Application.Parameters args) {
+        for (String par : args.getRaw().toArray(new String[0])) {
+            Path path = Path.of(par);
+            if (Files.exists(path)) {
+                mainApp.rootController.LoadFile(new File(path.toUri()));
+            }
+            if (par.equals("--dark")) {
+                mainApp.rootController.ToggleDark();
+                mainApp.rootController.darkCheck.setSelected(true);
+            }
         }
     }
 }

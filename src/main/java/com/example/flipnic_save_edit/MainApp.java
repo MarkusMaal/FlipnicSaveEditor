@@ -1,10 +1,10 @@
 package com.example.flipnic_save_edit;
 
 import javafx.application.Application;
-import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
@@ -13,14 +13,11 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Objects;
 
 public class MainApp extends Application {
     public Stage primaryStage;
@@ -32,9 +29,11 @@ public class MainApp extends Application {
 
     public Scene rootScene;
     public FirstForm controller;
+    public RootLayout rootController;
 
     public String version;
     public String savePath = "";
+    private static String args;
     public static String[] friendlyStageNames = "Biology A,Evolution A,Metallurgy A,Evolution B,Optics A,Evolution C,Biology B,Metallurgy B,Optics B,Geometry A,Evolution D".split(",");
     public static boolean darkMode = false;
 
@@ -42,6 +41,7 @@ public class MainApp extends Application {
     @Override
     public void start(Stage stage) throws IOException, XmlPullParserException {
         GetVersion();
+
         this.primaryStage = stage;
         this.primaryStage.setTitle("Flipnic Save Editor " + this.version);
         initRootLayout();
@@ -65,8 +65,9 @@ public class MainApp extends Application {
         rootLayout = (BorderPane) loader.load();
         rootScene = new Scene(rootLayout);
         primaryStage.setScene(rootScene);
-        RootLayout controller = loader.getController();
-        controller.setMainApp(this);
+        primaryStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("icon.png"))));
+        rootController = loader.getController();
+        rootController.setMainApp(this);
         primaryStage.show();
     }
 
@@ -78,10 +79,11 @@ public class MainApp extends Application {
         this.mainWindow = controller;
         controller.setMainApp(this);
         rootLayout.setCenter(firstForm);
+        controller.SetParameters(getParameters());
     }
 
     public static void main(String[] args) {
-        launch();
+        launch(args);
     }
 
 

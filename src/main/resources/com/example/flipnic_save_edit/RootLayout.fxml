@@ -30,7 +30,7 @@
            </Menu>
            <Menu text="Option_s">
                <CheckMenuItem fx:id="regionCheck" disable="true" onAction="#ToggleRegion" text="Use NTSC-_J stage names" />
-               <CheckMenuItem onAction="#ToggleDark" text="_Dark theme" />
+               <CheckMenuItem fx:id="darkCheck" onAction="#ToggleDark" text="_Dark theme" />
                <MenuItem fx:id="importMsgMenuItem" disable="true" onAction="#ImportMsgFile" text="_Import JA.MSG file (fix wrong missions)" />
            </Menu>
            <Menu text="Hel_p">

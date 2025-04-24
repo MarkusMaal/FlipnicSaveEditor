@@ -1,6 +1,5 @@
 package com.example.flipnic_save_edit;
 
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -50,8 +49,8 @@ public class FlipnicSave {
 
     public enum Control {
         LEFT_NUDGE,
-        LEFT_FLIPPER,
         RIGHT_NUDGE,
+        LEFT_FLIPPER,
         RIGHT_FLIPPER
     }
 

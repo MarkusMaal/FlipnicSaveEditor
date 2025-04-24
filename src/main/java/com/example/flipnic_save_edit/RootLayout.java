@@ -3,7 +3,6 @@ package com.example.flipnic_save_edit;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
@@ -14,6 +13,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 
 public class RootLayout {
+    public CheckMenuItem darkCheck;
     private String originalTitle;
     public CheckMenuItem regionCheck;
     public Menu importMenu;
@@ -75,7 +75,7 @@ public class RootLayout {
         LoadFile(file);
     }
 
-    private void LoadFile(File file) {
+    public void LoadFile(File file) {
         if (file != null) {
             mainApp.loadFile(file);
             importMenu.setDisable(false);
@@ -187,6 +187,7 @@ public class RootLayout {
         fileChooser.getExtensionFilters().add(extensionFilter);
         File file = fileChooser.showOpenDialog(mainApp.getPrimaryStage());
         try {
+            if (file == null) return;
             if (!mainApp.fs.ImportMessageFile(file.getAbsolutePath())) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Import message file");
@@ -196,6 +197,7 @@ public class RootLayout {
                 return;
             }
             mainApp.controller.update(mainApp.fs);
+            mainApp.controller.ReselectCombobox();
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Import message file");
             alert.setHeaderText("Message file imported successfully!");
