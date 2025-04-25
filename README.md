@@ -4,8 +4,6 @@ This tool allows you to edit Flipnic save files as well as partially fix corrupt
 
 ![Light theme](img/main.png)
 
-***NOTE***: This tool is in beta, so bugs are to be expected.
-
 ## Table of contents
 
 * [Locating save file](#locating-the-save-file)
@@ -64,6 +62,8 @@ This section lists some of the things that you can do with this save editor.
 This lists some info about the save file that you may find interesting. There are also two very important buttons:
 * Update checksums - In case any of the checksums are invalid, you can press this button to make them valid again. Attempting to load a save file where any of the checksums are invalid will cause the game to think the save file is corrupt and the game will simply refuse to load it.
 * Diagnose save file - If you actually have a corrupted save file, you can press this button to apply common fixes that can help you fix some parts of the save file.
+
+You can also modify some values here by clicking on the pencil button.
 
 ### Viewing and editing ranks
 

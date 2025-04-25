@@ -1,16 +1,20 @@
-package com.example.flipnic_save_edit;
+package com.paktc.flipnic_save_edit;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
 
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
 
 public class RootLayout {
     public CheckMenuItem darkCheck;
@@ -106,12 +110,16 @@ public class RootLayout {
                 alert.setTitle("Success");
                 alert.setHeaderText("File saved successfully");
                 alert.setContentText("Location: " + file.getAbsolutePath());
+                mainApp.SetAlertIcon(alert);
+                mainApp.SetAlertTheme(alert);
                 alert.showAndWait();
             } catch (IOException e) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Error");
                 alert.setHeaderText("Error saving file");
                 alert.setContentText("Details: " + e.getMessage());
+                mainApp.SetAlertIcon(alert);
+                mainApp.SetAlertTheme(alert);
                 alert.showAndWait();
             }
         }
@@ -130,12 +138,16 @@ public class RootLayout {
             alert.setTitle("Success");
             alert.setHeaderText("File saved successfully");
             alert.setContentText("Location: " + file);
+            mainApp.SetAlertIcon(alert);
+            mainApp.SetAlertTheme(alert);
             alert.showAndWait();
         } catch (IOException e) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");
             alert.setHeaderText("Error saving file");
             alert.setContentText("Details: " + e.getMessage());
+            mainApp.SetAlertIcon(alert);
+            mainApp.SetAlertTheme(alert);
             alert.showAndWait();
         }
     }
@@ -150,6 +162,8 @@ public class RootLayout {
         
         CRC-32 variant: JAMCRC
         Dark theme credit: Wesos de Queso""");
+        mainApp.SetAlertIcon(alert);
+        mainApp.SetAlertTheme(alert);
         alert.showAndWait();
     }
 
@@ -179,6 +193,8 @@ public class RootLayout {
             alert.setTitle("Import message file");
             alert.setHeaderText("Can't import");
             alert.setContentText("Please load a save file first!");
+            mainApp.SetAlertIcon(alert);
+            mainApp.SetAlertTheme(alert);
             alert.showAndWait();
             return;
         }
@@ -193,6 +209,8 @@ public class RootLayout {
                 alert.setTitle("Import message file");
                 alert.setHeaderText("Not a valid message file");
                 alert.setContentText("File path: " + file.getAbsolutePath());
+                mainApp.SetAlertIcon(alert);
+                mainApp.SetAlertTheme(alert);
                 alert.showAndWait();
                 return;
             }
@@ -202,12 +220,16 @@ public class RootLayout {
             alert.setTitle("Import message file");
             alert.setHeaderText("Message file imported successfully!");
             alert.setContentText("Note that you need to re-import it every time you load a save file.");
+            mainApp.SetAlertIcon(alert);
+            mainApp.SetAlertTheme(alert);
             alert.showAndWait();
         } catch (IOException e) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Import message file");
             alert.setHeaderText("Failed to import message file");
             alert.setContentText("Error: " + e.getMessage());
+            mainApp.SetAlertIcon(alert);
+            mainApp.SetAlertTheme(alert);
             alert.showAndWait();
         }
     }
@@ -221,6 +243,8 @@ public class RootLayout {
             alert.setTitle("Toggle theme");
             alert.setHeaderText("Failed to switch theme");
             alert.setContentText("Error: " + e.getMessage());
+            mainApp.SetAlertIcon(alert);
+            mainApp.SetAlertTheme(alert);
             alert.showAndWait();
         }
     }
@@ -236,6 +260,8 @@ public class RootLayout {
         In addition, the author of this program will not be held responsible for damage done to your Flipnic save file. Please remember to click the "Update checksums" button before saving to avoid the "Save file may be corrupt" error message.
         
         The features of this program should not be used to cheat in score or time attack competitions.""");
+        mainApp.SetAlertIcon(alert);
+        mainApp.SetAlertTheme(alert);
         alert.showAndWait();
     }
 
@@ -258,6 +284,8 @@ public class RootLayout {
         There are 2 possible reasons. First reason, one of the checksums is invalid. To rectify this, simply click on the "Update checksums" button and that'll fix any checksum related issues. Second reason may be that the save file is the wrong size. To check for this, click on the "Diagnose save file" button, which will perform various checks on the save file and attempt to fix them. You must also ensure that there are no other files other than the ones put there by Flipnic on the game's save directory.
         """
         );
+        mainApp.SetAlertIcon(alert);
+        mainApp.SetAlertTheme(alert);
         alert.showAndWait();
         alert.setHeaderText("Frequently asked questions (2/3)");
         alert.setContentText(
@@ -319,6 +347,8 @@ public class RootLayout {
             alert.setTitle("Import data");
             alert.setHeaderText("Failed to import data");
             alert.setContentText("Error: " + e.getMessage());
+            mainApp.SetAlertIcon(alert);
+            mainApp.SetAlertTheme(alert);
             alert.showAndWait();
         }
     }
@@ -344,5 +374,19 @@ public class RootLayout {
 
         File file = fileChooser.showSaveDialog(mainApp.getPrimaryStage());
         TransferData(mi.getText(), file, true);
+    }
+
+    @FXML
+    public void OpenReadme() {
+        try {
+            String urlString = "https://github.com/MarkusMaal/FlipnicSaveEditor/blob/master/README.md";
+            if (System.getProperty("os.name").contains("nix") || System.getProperty("os.name").contains("nux")) {
+                Runtime.getRuntime().exec(new String[] { "xdg-open", urlString });
+            } else {
+                Desktop.getDesktop().browse(URI.create(urlString));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

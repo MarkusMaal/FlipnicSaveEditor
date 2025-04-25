@@ -1,4 +1,4 @@
-package com.example.flipnic_save_edit;
+package com.paktc.flipnic_save_edit;
 
 import java.io.IOException;
 import java.nio.file.Files;

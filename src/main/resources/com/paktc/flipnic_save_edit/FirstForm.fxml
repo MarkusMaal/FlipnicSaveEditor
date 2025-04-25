@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.paktc.flipnic_save_edit.FirstForm">
+    <TabPane fx:id="windowTabs" accessibleRoleDescription="Save editor tab navigation panel" accessibleText="Use Control+Tab to navigate between various tabs" layoutX="3.0" layoutY="47.0" prefHeight="400.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <Tab text="Information">
+            <AnchorPane accessibleRoleDescription="Information panel" accessibleText="Displays information about save file data" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                <GridPane accessibleRoleDescription="Information grid" prefHeight="311.0" prefWidth="590.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    </rowConstraints>
+                    <Label fx:id="checkSumLabel" accessibleRoleDescription="Checksum value" accessibleText="A unique identifier, for verifying save file integrity" alignment="TOP_LEFT" prefHeight="23.0" prefWidth="291.0" text="No file loaded" textAlignment="CENTER" GridPane.columnIndex="1">
+                        <font>
+                            <Font name="Calibri" size="18.0" />
+                        </font>
+                        <GridPane.margin>
+                            <Insets left="5.0" />
+                        </GridPane.margin>
+                    </Label>
+                    <Label alignment="CENTER_RIGHT" prefHeight="21.0" prefWidth="293.0" text="Primary checksum:" GridPane.halignment="RIGHT">
+                        <font>
+                            <Font name="Calibri" size="17.0" />
+                        </font>
+                        <GridPane.margin>
+                            <Insets right="5.0" />
+                        </GridPane.margin>
+                    </Label>
+                    <Label alignment="CENTER_RIGHT" prefHeight="22.0" prefWidth="294.0" text="Current score:" GridPane.halignment="RIGHT" GridPane.rowIndex="2">
+                        <font>
+                            <Font name="Calibri" size="17.0" />
+                        </font>
+                        <GridPane.margin>
+                            <Insets right="5.0" />
+                        </GridPane.margin>
+                    </Label>
+                    <Label alignment="CENTER_RIGHT" prefHeight="21.0" prefWidth="296.0" text="Current stage:" GridPane.halignment="RIGHT" GridPane.rowIndex="4">
+                        <font>
+                            <Font name="Calibri" size="17.0" />
+                        </font>
+                        <GridPane.margin>
+                            <Insets right="5.0" />
+                        </GridPane.margin>
+                    </Label>
+                    <Label fx:id="currentStageLabel" accessibleText="Current stage in original game" text="Biology A" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                        <font>
+                            <Font name="Calibri" size="18.0" />
+                        </font>
+                        <GridPane.margin>
+                            <Insets left="5.0" />
+                        </GridPane.margin>
+                    </Label>
+                    <Label fx:id="redundantChecksumLabel" accessibleText="Secondary unique identifier used by the game for verifying save file integrity" prefHeight="23.0" prefWidth="291.0" text="No file loaded" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                        <font>
+                            <Font name="Calibri" size="18.0" />
+                        </font>
+                        <GridPane.margin>
+                            <Insets left="5.0" />
+                        </GridPane.margin>
+                    </Label>
+                    <Label text="Backup checksum:" textAlignment="RIGHT" GridPane.halignment="RIGHT" GridPane.rowIndex="1">
+                        <GridPane.margin>
+                            <Insets right="5.0" />
+                        </GridPane.margin>
+                        <font>
+                            <Font name="Calibri" size="17.0" />
+                        </font>
+                    </Label>
+                    <Label alignment="CENTER_RIGHT" prefHeight="21.0" prefWidth="296.0" text="Last stage played:" GridPane.halignment="RIGHT" GridPane.rowIndex="5">
+                        <font>
+                            <Font name="Calibri" size="17.0" />
+                        </font>
+                        <GridPane.margin>
+                            <Insets right="5.0" />
+                        </GridPane.margin>
+                    </Label>
+                    <Label fx:id="lastPlayedStageLabel" accessibleText="Last stage that was played with this save file" text="N/A" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                        <font>
+                            <Font name="Calibri" size="17.0" />
+                        </font>
+                        <GridPane.margin>
+                            <Insets left="5.0" />
+                        </GridPane.margin>
+                    </Label>
+                    <Button fx:id="updateSumsButton" accessibleText="Updating checksums ensures that the save file is not seen as corrupted by the game." onAction="#updateChecksums" text="_Update checksums" GridPane.halignment="RIGHT" GridPane.rowIndex="6">
+                        <GridPane.margin>
+                            <Insets right="5.0" />
+                        </GridPane.margin>
+                    </Button>
+                    <Button accessibleText="Fix other save file problems, such as the file size, headers and footers, etc." onAction="#applyFixes" text="Diagnose save _file" GridPane.columnIndex="1" GridPane.rowIndex="6">
+                        <GridPane.margin>
+                            <Insets left="5.0" />
+                        </GridPane.margin>
+                    </Button>
+                    <FlowPane alignment="CENTER_LEFT" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                        <GridPane.margin>
+                            <Insets left="5.0" />
+                        </GridPane.margin>
+                        <Label fx:id="currentScoreLabel" accessibleText="Player's current score in original game" prefHeight="21.0" text="0">
+                            <font>
+                                <Font name="Calibri" size="18.0" />
+                            </font>
+                        </Label>
+                        <Button fx:id="EditScoreButton" mnemonicParsing="false" onAction="#EditScoreClick" text="🖊️">
+                            <FlowPane.margin>
+                                <Insets left="10.0" />
+                            </FlowPane.margin>
+                        </Button>
+                        <TextField fx:id="ScoreEditField" onKeyPressed="#ScoreFieldKeyPress" visible="false">
+                            <opaqueInsets>
+                                <Insets />
+                            </opaqueInsets>
+                            <FlowPane.margin>
+                                <Insets left="5.0" />
+                            </FlowPane.margin>
+                        </TextField>
+                    </FlowPane>
+               <Label alignment="BOTTOM_RIGHT" text="Difficulty:" GridPane.halignment="RIGHT" GridPane.rowIndex="3">
+                  <font>
+                     <Font name="Calibri" size="17.0" />
+                  </font>
+                  <GridPane.margin>
+                     <Insets right="5.0" />
+                  </GridPane.margin>
+               </Label>
+                    <FlowPane alignment="CENTER_LEFT" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="3">
+                        <GridPane.margin>
+                            <Insets left="5.0" />
+                        </GridPane.margin>
+                        <ComboBox fx:id="EditDifficultyCombobox" onAction="#ChangeCurrentDifficulty" prefWidth="1.0" visible="false">
+                            <FlowPane.margin>
+                                <Insets left="5.0" />
+                            </FlowPane.margin>
+                        </ComboBox>
+                        <Label fx:id="CurrentDifficultyLabel" text="Easy">
+                            <font>
+                                <Font name="Calibri" size="18.0" />
+                            </font>
+                        </Label>
+                        <Button fx:id="EditDifficultyButton" mnemonicParsing="false" onAction="#EditDifficultyClick" text="🖊️">
+                            <FlowPane.margin>
+                                <Insets left="5.0" />
+                            </FlowPane.margin>
+                        </Button>
+                    </FlowPane>
+                </GridPane>
+            </AnchorPane>
+        </Tab>
+        <Tab onSelectionChanged="#ReselectCombobox" text="Ranking">
+            <AnchorPane accessibleRoleDescription="Ranking panel" accessibleText="Displays player rankings on various stages, mostly for free play game modes." minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                <Label accessibleRoleDescription="Ranking data" layoutX="14.0" layoutY="176.0" prefHeight="18.0" prefWidth="117.0" text="Ranking data" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="473.0" AnchorPane.topAnchor="10.0" />
+                <ComboBox fx:id="gameModeSelector" accessibleRoleDescription="Game mode" layoutX="14.0" layoutY="200.0" onAction="#onChangeMode" prefHeight="25.0" prefWidth="575.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="40.0" />
+                <TableView fx:id="rankingTable" accessibleRoleDescription="Rankings for selected game mode" editable="true" layoutX="14.0" layoutY="235.0" prefHeight="152.0" prefWidth="575.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="80.0" />
+            </AnchorPane>
+        </Tab>
+        <Tab fx:id="optionTab" text="Options">
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                <GridPane layoutX="121.0" layoutY="141.0" prefHeight="371.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    </rowConstraints>
+                    <Label text="Sound mode">
+                        <font>
+                            <Font name="Calibri" size="17.0" />
+                        </font>
+                        <GridPane.margin>
+                            <Insets left="10.0" />
+                        </GridPane.margin>
+                    </Label>
+                    <ComboBox fx:id="soundModeLabel" accessibleRoleDescription="Sound output type" accessibleText="Determines if the sound should be outputted through one channel or 2 channels." onAction="#updateSettings" promptText="Mono" GridPane.columnIndex="1">
+                    </ComboBox>
+                    <Label text="Volume: sound effects" GridPane.rowIndex="1">
+                        <font>
+                            <Font name="Calibri" size="17.0" />
+                        </font>
+                        <GridPane.margin>
+                            <Insets left="10.0" />
+                        </GridPane.margin>
+                    </Label>
+                    <ComboBox fx:id="sfxVolumeLabel" accessibleRoleDescription="Sound effects volume level" accessibleText="The volume for various sound effects, range is from 0 to 127" onAction="#updateSettings" promptText="0%" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                    </ComboBox>
+                    <Label text="Volume: music" GridPane.rowIndex="2">
+                        <font>
+                            <Font name="Calibri" size="17.0" />
+                        </font>
+                        <GridPane.margin>
+                            <Insets left="10.0" />
+                        </GridPane.margin>
+                    </Label>
+                    <ComboBox fx:id="bgmVolumeLabel" accessibleRoleDescription="Background music volume" accessibleText="Sound volume for background music and FMVs. Range is from 1 to 127." onAction="#updateSettings" promptText="0%" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                    </ComboBox>
+                    <Label text="Vibration" GridPane.rowIndex="3">
+                        <font>
+                            <Font name="Calibri" size="17.0" />
+                        </font>
+                        <GridPane.margin>
+                            <Insets left="10.0" />
+                        </GridPane.margin>
+                    </Label>
+                    <CheckBox fx:id="vibrationLabel" accessibleRoleDescription="Vibration setting" accessibleText="Vibrates the controller for haptic feedback. Binary value." onAction="#updateSettings" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                        <font>
+                            <Font name="Calibri" size="17.0" />
+                        </font>
+                    </CheckBox>
+                    <Label text="Left Flipper" GridPane.rowIndex="4">
+                        <font>
+                            <Font name="Calibri" size="17.0" />
+                        </font>
+                        <GridPane.margin>
+                            <Insets left="10.0" />
+                        </GridPane.margin>
+                    </Label>
+                    <ComboBox fx:id="leftFlipperLabel" accessibleRoleDescription="Left flipper button binding" onAction="#updateSettings" promptText="L2" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                    </ComboBox>
+                    <Label text="Right Flipper" GridPane.rowIndex="5">
+                        <font>
+                            <Font name="Calibri" size="17.0" />
+                        </font>
+                        <GridPane.margin>
+                            <Insets left="10.0" />
+                        </GridPane.margin>
+                    </Label>
+                    <ComboBox fx:id="rightFlipperLabel" accessibleRoleDescription="Right flipper button binding" onAction="#updateSettings" promptText="L2" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                    </ComboBox>
+                    <Label text="Left Nudge" GridPane.rowIndex="6">
+                        <font>
+                            <Font name="Calibri" size="17.0" />
+                        </font>
+                        <GridPane.margin>
+                            <Insets left="10.0" />
+                        </GridPane.margin>
+                    </Label>
+                    <ComboBox fx:id="leftNudgeLabel" accessibleRoleDescription="Left nudge button binding" onAction="#updateSettings" promptText="L2" GridPane.columnIndex="1" GridPane.rowIndex="6">
+                    </ComboBox>
+                    <Label text="Right Nudge" GridPane.rowIndex="7">
+                        <font>
+                            <Font name="Calibri" size="17.0" />
+                        </font>
+                        <GridPane.margin>
+                            <Insets left="10.0" />
+                        </GridPane.margin>
+                    </Label>
+                    <ComboBox fx:id="rightNudgeLabel" accessibleRoleDescription="Right nudge button binding" onAction="#updateSettings" promptText="L2" GridPane.columnIndex="1" GridPane.rowIndex="7">
+                    </ComboBox>
+               <Button mnemonicParsing="false" onAction="#ResetControlsClick" text="Reset controls" GridPane.rowIndex="8">
+                  <GridPane.margin>
+                     <Insets left="5.0" />
+                  </GridPane.margin>
+               </Button>
+                </GridPane>
+            </AnchorPane>
+        </Tab>
+
+        <Tab text="Unlocks">
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                <RadioButton fx:id="originalRad" accessibleRoleDescription="View unlocks for original game mode" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#onGameModeChanged" selected="true" text="Original game" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
+                <RadioButton fx:id="freeRad" accessibleRoleDescription="View unlocks for free play mode" layoutX="130.0" layoutY="14.0" mnemonicParsing="false" onAction="#onGameModeChanged" text="Free play" AnchorPane.leftAnchor="120.0" AnchorPane.topAnchor="10.0">
+                    <padding>
+                        <Insets left="10.0" />
+                    </padding>
+                </RadioButton>
+                <FlowPane hgap="10.0" layoutX="14.0" layoutY="49.0" prefHeight="314.0" prefWidth="580.0" vgap="10.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="50.0">
+                    <CheckBox fx:id="bioACheck" mnemonicParsing="false" onAction="#updateChecks" text="Biology A" />
+                    <CheckBox fx:id="bioBCheck" mnemonicParsing="false" onAction="#updateChecks" text="Biology B" />
+                    <CheckBox fx:id="metACheck" mnemonicParsing="false" onAction="#updateChecks" text="Metallurgy A" />
+                    <CheckBox fx:id="metBCheck" mnemonicParsing="false" onAction="#updateChecks" text="Metallurgy B" />
+                    <CheckBox fx:id="optACheck" mnemonicParsing="false" onAction="#updateChecks" text="Optics A" />
+                    <CheckBox fx:id="optBCheck" mnemonicParsing="false" onAction="#updateChecks" text="Optics B" />
+                    <CheckBox fx:id="geoACheck" mnemonicParsing="false" onAction="#updateChecks" text="Geometry A" />
+                    <CheckBox fx:id="evoACheck" mnemonicParsing="false" onAction="#updateChecks" text="Evolution A" />
+                    <CheckBox fx:id="evoBCheck" mnemonicParsing="false" onAction="#updateChecks" text="Evolution B" />
+                    <CheckBox fx:id="evoCCheck" mnemonicParsing="false" onAction="#updateChecks" text="Evolution C" />
+                    <CheckBox fx:id="evoDCheck" mnemonicParsing="false" onAction="#updateChecks" text="Evolution D" />
+                    <CheckBox fx:id="creditsCheck" mnemonicParsing="false" onAction="#updateChecks" text="Credits" visible="false" />
+                </FlowPane>
+                <Button accessibleRoleDescription="Reset progress" accessibleText="Reset all unlocks for selected game type" layoutX="534.0" layoutY="6.0" onAction="#resetButton" text="_Reset" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
+                <FlowPane alignment="BOTTOM_LEFT" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="150.0">
+                    <CheckBox fx:id="forceStageCheckbox" accessibleText="Force enable score mode for a specific stage in original game that is already completed." mnemonicParsing="false" onAction="#updateForcedStage" text="Force score mode">
+                        <FlowPane.margin>
+                            <Insets left="5.0" top="5.0" />
+                        </FlowPane.margin>
+                    </CheckBox>
+                    <ComboBox fx:id="forceStageCombobox" accessibleRoleDescription="List of original game stages" onAction="#updateForcedStage" prefHeight="26.0" prefWidth="207.0">
+                        <FlowPane.margin>
+                            <Insets left="15.0" top="5.0" />
+                        </FlowPane.margin>
+                    </ComboBox>
+                </FlowPane>
+            </AnchorPane>
+        </Tab>
+        <Tab onSelectionChanged="#ReselectCombobox" text="Missions">
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                <ComboBox fx:id="missionsComboBox" accessibleRoleDescription="Stage name" layoutX="14.0" layoutY="14.0" onAction="#onMissionStageChanged" prefHeight="25.0" prefWidth="575.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
+                <Label fx:id="missionsLabel" layoutX="14.0" layoutY="46.0" text="Nothing to show here..." AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="50.0" />
+                <TableView fx:id="stageStatusTable" accessibleRoleDescription="List of missions" editable="true" layoutX="10.0" layoutY="43.0" prefHeight="322.0" prefWidth="578.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="50.0">
+                    <columns>
+                        <TableColumn prefWidth="75.0" text="Type" />
+                        <TableColumn prefWidth="437.0" text="Mission" />
+                        <TableColumn minWidth="0.0" prefWidth="141.0" text="Status" />
+                    </columns>
+                </TableView>
+            </AnchorPane>
+        </Tab>
+        <Tab text="Stages">
+
+            <AnchorPane accessibleRoleDescription="Stage panel" accessibleText="Displays directories used for stages. These will always have default values unless explicitly changed." minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                <TableView fx:id="stageDirTable" accessibleRoleDescription="Stage directories" editable="true" layoutX="14.0" layoutY="50.0" prefHeight="309.0" prefWidth="580.0" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
+                <Label alignment="CENTER" contentDisplay="CENTER" layoutX="10.0" layoutY="5.0" prefHeight="39.0" prefWidth="579.0" text="This section allows you to modify the stages that will load in original game. Selecting &quot;DEMO1&quot; will cause the game to crash upon selecting the stage." wrapText="true" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="11.0" />
+            </AnchorPane>
+        </Tab>
+    </TabPane>
+
+</AnchorPane>

@@ -3,7 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane fx:id="borderPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="650.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.flipnic_save_edit.RootLayout">
+<BorderPane fx:id="borderPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="650.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.paktc.flipnic_save_edit.RootLayout">
    <top>
        <MenuBar accessibleRoleDescription="Primary menu bar" BorderPane.alignment="CENTER">
            <Menu text="Fil_e">
@@ -34,6 +34,7 @@
                <MenuItem fx:id="importMsgMenuItem" disable="true" onAction="#ImportMsgFile" text="_Import JA.MSG file (fix wrong missions)" />
            </Menu>
            <Menu text="Hel_p">
+            <MenuItem onAction="#OpenReadme" text="_Readme" />
             <MenuItem onAction="#ShowFaq" text="_FAQ" />
                <MenuItem onAction="#ShowDisclaimer" text="_Disclaimer" />
             <SeparatorMenuItem mnemonicParsing="false" />

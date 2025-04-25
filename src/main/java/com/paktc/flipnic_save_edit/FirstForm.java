@@ -1,13 +1,16 @@
-package com.example.flipnic_save_edit;
+package com.paktc.flipnic_save_edit;
 
 import javafx.application.Application;
 import javafx.beans.value.ObservableValueBase;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -28,6 +31,11 @@ public class FirstForm {
     public Tab optionTab;
     public Label lastPlayedStageLabel;
     public TabPane windowTabs;
+    public Button EditScoreButton;
+    public TextField ScoreEditField;
+    public Button EditDifficultyButton;
+    public ComboBox EditDifficultyCombobox;
+    public Label CurrentDifficultyLabel;
     // information
     @FXML
     private Button updateSumsButton;
@@ -136,6 +144,7 @@ public class FirstForm {
         leftFlipperLabel.setItems(FXCollections.observableList(List.of(FlipnicSave.GetAllInputs())));
         rightNudgeLabel.setItems(FXCollections.observableList(List.of(FlipnicSave.GetAllInputs())));
         rightFlipperLabel.setItems(FXCollections.observableList(List.of(FlipnicSave.GetAllInputs())));
+        EditDifficultyCombobox.setManaged(false);
         freeRad.setToggleGroup(grp);
         originalRad.setToggleGroup(grp);
     }
@@ -180,6 +189,25 @@ public class FirstForm {
         }
     }
 
+    public void update(FlipnicSave fs, boolean showIssues) {
+        update(fs);
+        if (showIssues) {
+            if (!fs.isValidSave()) {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.show();
+                alert.close();
+                alert = new Alert(Alert.AlertType.WARNING);
+                mainApp.SetAlertIcon(alert);
+                mainApp.SetAlertTheme(alert);
+                alert.setTitle("Checksum mismatch");
+                alert.setHeaderText("Failed to validate checksums");
+                alert.setContentText("The save file may be corrupt");
+                alert.initOwner(mainApp.primaryStage);
+                alert.showAndWait();
+            }
+        }
+    }
+
     public void update(FlipnicSave fs) {
         locked = true;
         windowTabs.setDisable(!fs.isLoaded());
@@ -190,16 +218,21 @@ public class FirstForm {
             currentScoreLabel.setText(String.valueOf(fs.GetCurrentScore()));
             currentStageLabel.setText(fs.GetCurrentStage());
             lastPlayedStageLabel.setText(fs.GetLastPlayedStage());
+            CurrentDifficultyLabel.setText(fs.GetCurrentDifficulty());
             // options
             sfxVolumeLabel.getSelectionModel().select(fs.getVolumeSfx());
             bgmVolumeLabel.getSelectionModel().select(fs.getVolumeBgm());
             soundModeLabel.getSelectionModel().select(fs.getSoundMode().equals("Mono") ? 0 : 1);
             vibrationLabel.setSelected(fs.getVibration());
             // inputs
-            leftNudgeLabel.getSelectionModel().select(fs.getLeftNudge());
-            rightNudgeLabel.getSelectionModel().select(fs.getRightNudge());
-            leftFlipperLabel.getSelectionModel().select(fs.getLeftFlipper());
-            rightFlipperLabel.getSelectionModel().select(fs.getRightFlipper());
+            try {
+                leftNudgeLabel.getSelectionModel().select(fs.getLeftNudge());
+                rightNudgeLabel.getSelectionModel().select(fs.getRightNudge());
+                leftFlipperLabel.getSelectionModel().select(fs.getLeftFlipper());
+                rightFlipperLabel.getSelectionModel().select(fs.getRightFlipper());
+            } catch (Exception e) {
+                System.out.println("Failed to decode inputs!!!");
+            }
             onGameModeChanged();
             // misc
             updateMissions();
@@ -213,6 +246,7 @@ public class FirstForm {
             currentScoreLabel.setText("0");
             currentStageLabel.setText("Biology A");
             lastPlayedStageLabel.setText("N/A");
+            CurrentDifficultyLabel.setText("Easy");
             // options
             bgmVolumeLabel.getSelectionModel().select(0);
             sfxVolumeLabel.getSelectionModel().select(0);
@@ -418,6 +452,8 @@ public class FirstForm {
             alert.setTitle("Diagnose save file");
             alert.setHeaderText("No fixes were applied");
             alert.setContentText("Your save file appears to have the correct structure");
+            mainApp.SetAlertIcon(alert);
+            mainApp.SetAlertTheme(alert);
             alert.showAndWait();
             return;
         }
@@ -425,6 +461,8 @@ public class FirstForm {
         alert.setTitle("Diagnose save file");
         alert.setHeaderText("Success");
         alert.setContentText("Corrections were made to the save file:\n\n" + String.join("\n", fixes));
+        mainApp.SetAlertIcon(alert);
+        mainApp.SetAlertTheme(alert);
         alert.showAndWait();
         update(mainApp.fs);
     }
@@ -495,6 +533,58 @@ public class FirstForm {
         missionsComboBox.getSelectionModel().select(0);
         gameModeSelector.getSelectionModel().select(-1);
         gameModeSelector.getSelectionModel().select(0);
+    }
+
+    @FXML
+    public void EditScoreClick(ActionEvent actionEvent) {
+        EditScoreButton.setVisible(false);
+        EditScoreButton.setManaged(false);
+        currentScoreLabel.setVisible(false);
+        currentScoreLabel.setManaged(false);
+        ScoreEditField.setText(currentScoreLabel.getText());
+        ScoreEditField.setVisible(true);
+        ScoreEditField.requestFocus();
+    }
+
+    @FXML
+    public void ScoreFieldKeyPress(KeyEvent keyEvent) {
+        if (keyEvent.getCode() != KeyCode.ENTER) {
+            return;
+        }
+        try {
+            mainApp.fs.SetCurrentScore(Integer.parseInt(ScoreEditField.getText()));
+        } catch (NumberFormatException e) {
+            return;
+        }
+        EditScoreButton.setVisible(true);
+        EditScoreButton.setManaged(true);
+        currentScoreLabel.setVisible(true);
+        currentScoreLabel.setManaged(true);
+        ScoreEditField.setVisible(false);
+        update(mainApp.fs);
+    }
+
+    @FXML
+    public void EditDifficultyClick() {
+        locked = true;
+        EditDifficultyCombobox.setItems(FXCollections.observableList(Arrays.stream(new String[] {"Easy", "Normal", "Hard"}).toList()));
+        EditDifficultyCombobox.getSelectionModel().select(mainApp.fs.GetCurrentDifficultyIdx());
+        EditDifficultyCombobox.requestFocus();
+        EditDifficultyCombobox.show();
+        locked = false;
+    }
+
+    @FXML
+    public void ChangeCurrentDifficulty() {
+        if (locked) return;
+        mainApp.fs.SetCurrentDifficulty((String)EditDifficultyCombobox.getSelectionModel().getSelectedItem());
+        update(mainApp.fs);
+    }
+
+    @FXML
+    public void ResetControlsClick() {
+        mainApp.fs.ResetControls();
+        update(mainApp.fs);
     }
 
     public static class Model {

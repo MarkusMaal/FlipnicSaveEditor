@@ -1,4 +1,4 @@
-module com.example.flipnic_save_edit {
+module com.paktc.flipnic_save_edit {
     requires javafx.controls;
     requires javafx.fxml;
 
@@ -7,7 +7,8 @@ module com.example.flipnic_save_edit {
     requires org.kordamp.bootstrapfx.core;
     requires maven.model;
     requires plexus.utils;
+    requires java.desktop;
 
-    opens com.example.flipnic_save_edit to javafx.fxml;
-    exports com.example.flipnic_save_edit;
+    opens com.paktc.flipnic_save_edit to javafx.fxml;
+    exports com.paktc.flipnic_save_edit;
 }

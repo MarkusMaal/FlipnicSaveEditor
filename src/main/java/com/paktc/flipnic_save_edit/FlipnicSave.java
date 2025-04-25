@@ -1,4 +1,4 @@
-package com.example.flipnic_save_edit;
+package com.paktc.flipnic_save_edit;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -9,6 +9,8 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
@@ -89,10 +91,16 @@ public class FlipnicSave {
         if (data.length > 0) dataList = Arrays.stream(data).toList();
 
         if (addr >= dataList.size()) {
-            System.out.println("Offset " + addr + " out of range!");
+            LogError("Offset " + addr + " out of range!");
             return 0x00;
         }
         return dataList.get(addr);
+    }
+
+    private String ClockTime() {
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        return now.format(formatter);
     }
 
     private byte[] ReadBytes(int addr, int count, Byte... data) {
@@ -100,7 +108,7 @@ public class FlipnicSave {
         if (data.length > 0) dataList = Arrays.stream(data).toList();
 
         if (addr + count > dataList.size()) {
-            System.out.println("Invalid range: " + addr + " to " + (addr+count));
+            LogError("Invalid range: " + addr + " to " + (addr+count));
             return new byte[count];
         }
         byte[] returnArray = new byte[count];
@@ -111,12 +119,16 @@ public class FlipnicSave {
         }
         return returnArray;
     }
+
+    private void LogError(String error) {
+        System.err.println("[" + ClockTime() + "] " + error);
+    }
+
     private byte[] ReadBytesLE(int addr, int count, Byte... data) {
         List<Byte> dataList = this.dataList;
         if (data.length > 0) dataList = Arrays.stream(data).toList();
-
-        if (addr + count > dataList.size()) {
-            System.out.println("Invalid range: " + addr + " to " + (addr+count));
+        if ((addr + count < 0) ||(addr + count > dataList.size())) {
+            LogError("Invalid range: " + addr + " to " + (addr+count));
             return new byte[count];
         }
         byte[] returnArray = new byte[count];
@@ -151,7 +163,7 @@ public class FlipnicSave {
 
     private void WriteByte(int addr, byte value) {
         if (addr >= this.dataList.size()) {
-            System.out.println("Offset " + addr + " out of range!");
+            LogError("Offset " + addr + " out of range!");
             return;
         }
         dataList.set(addr, value);
@@ -285,6 +297,39 @@ public class FlipnicSave {
     public int GetCurrentScore() {
         byte[] scoreData = this.ReadBytesLE(0x28, 0x4);
         return ByteBuffer.wrap(scoreData).getInt();
+    }
+
+    public void SetCurrentScore(int value) {
+        ByteBuffer buffer = ByteBuffer.allocate(Integer.BYTES);
+        buffer.putInt(value);
+        byte[] scoreData = this.ReverseArray(buffer.array());
+        int offset = 0x28;
+        for (byte b : scoreData) {
+            WriteByte(offset, b);
+            offset++;
+        }
+    }
+
+    public String GetCurrentDifficulty() {
+        return switch (ReadByte(0x30)) {
+            case 0x00 -> "Easy";
+            case 0x01 -> "Normal";
+            case 0x02 -> "Hard";
+            default -> "(null)";
+        };
+    }
+
+    public int GetCurrentDifficultyIdx() {
+        return ReadByte(0x30);
+    }
+
+    public void SetCurrentDifficulty(String difficulty) {
+        byte diff = switch (difficulty) {
+            case "Normal" -> 0x01;
+            case "Hard" -> 0x02;
+            default -> 0x00;
+        };
+        WriteByte(0x30, diff);
     }
 
     public String GetCurrentStage() {
@@ -605,8 +650,13 @@ public class FlipnicSave {
 
     public String[] getStageDirs() {
         List<String> dirs = new ArrayList<>();
-        for (int offset = 4300; offset < 4344; offset+=4)
-            dirs.add(stageDir[ByteBuffer.wrap(ReadBytesLE(offset, 4)).getInt()]);
+        for (int offset = 4300; offset < 4344; offset+=4) {
+            try {
+                dirs.add(stageDir[ByteBuffer.wrap(ReadBytesLE(offset, 4)).getInt()]);
+            } catch (Exception e) {
+                LogError("Failed to decode stage directory!");
+            }
+        }
         return dirs.toArray(new String[0]);
     }
 
@@ -676,6 +726,13 @@ public class FlipnicSave {
     }
 
 
+    public void ResetControls() {
+        this.SetControl(Control.LEFT_FLIPPER, (byte)0x0F);
+        this.SetControl(Control.RIGHT_FLIPPER, (byte)0x05);
+        this.SetControl(Control.LEFT_NUDGE, (byte)0x02);
+        this.SetControl(Control.RIGHT_NUDGE, (byte)0x03);
+    }
+
     // diagnostics
 
     public String[] FixStructure() {
@@ -683,6 +740,10 @@ public class FlipnicSave {
         if (SizeFix()) fixes.add("Save size fix");
         if (HeaderFix()) fixes.add("Header fix");
         if (FooterFix()) fixes.add("Footer fix");
+        if (CurrentStageFix()) fixes.add("Current stage fix");
+        if (InputFix()) fixes.add("Controller input fix");
+        if (StageDirFix()) fixes.add("Stage directory fix");
+        if (MissionCountFix()) fixes.add("Mission count fix");
         if (ChecksumFix()) fixes.add("Checksum fix"); // always do this one last
         return fixes.toArray(new String[0]);
     }
@@ -737,5 +798,80 @@ public class FlipnicSave {
             expected += ByteBuffer.wrap(this.ReadBytesLE(offset, 4)).getInt();
         }
         return expected;
+    }
+
+    public boolean CurrentStageFix() {
+        byte[] stageIdBytes = this.ReadBytesLE(0x10C8, 0x4);
+        int stageId = ByteBuffer.wrap(stageIdBytes).getInt();
+        if ((stageId > originalModes.length - 1) || (stageId < 0)) {
+            WriteByte(0x10C8, (byte)11);
+            WriteByte(0x10C9, (byte)0);
+            WriteByte(0x10CA, (byte)0);
+            WriteByte(0x10CB, (byte)0);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean StageDirFix() {
+        boolean appliedFixes = false;
+        for (int offset = 4300; offset < 4344; offset+=4) {
+            int stageDir = ByteBuffer.wrap(ReadBytesLE(offset, 4)).getInt();
+            if ((stageDir < 0) || (stageDir > this.stageDir.length - 1)) {
+                WriteByte(offset, (byte)0);
+                WriteByte(offset+1, (byte)0);
+                WriteByte(offset+2, (byte)0);
+                WriteByte(offset+3, (byte)0);
+                appliedFixes = true;
+            }
+        }
+        return appliedFixes;
+    }
+
+    public boolean InputFix() {
+        boolean appliedFixes = false;
+        byte leftFlipper = this.ReadByte(0x23);
+        byte rightFlipper = this.ReadByte(0x19);
+        byte leftNudge = this.ReadByte(0x16);
+        byte rightNudge = this.ReadByte(0x17);
+        if ((leftFlipper > 0x0F) || (leftFlipper < 0)) {
+            this.SetControl(Control.LEFT_FLIPPER, (byte)0x0F);
+            appliedFixes = true;
+        }
+        if ((rightFlipper > 0x0F) || (rightFlipper < 0)) {
+            this.SetControl(Control.RIGHT_FLIPPER, (byte)0x05);
+            appliedFixes = true;
+        }
+        if ((leftNudge > 0x0F) || (leftNudge < 0)) {
+            this.SetControl(Control.LEFT_NUDGE, (byte)0x02);
+            appliedFixes = true;
+        }
+        if ((rightNudge > 0x0F) || (rightNudge < 0)) {
+            this.SetControl(Control.RIGHT_NUDGE, (byte)0x03);
+            appliedFixes = true;
+        }
+        return appliedFixes;
+    }
+
+    public boolean MissionCountFix() {
+        int totalMissions = 0;
+        for (int i = 0; i < 11; i++) {
+            totalMissions += this.GetMissions(i).length;
+        }
+        if (totalMissions == GetExpectedCount()) return false;
+        int i = 0;
+        for (int offset = 0x110C; offset < 0x110C+0x2C; offset+=4) {
+            int expected = this.GetMissions(i).length;
+            ByteBuffer bb = ByteBuffer.allocate(4);
+            bb.putInt(expected);
+            byte[] writeBytes = this.ReverseArray(bb.array());
+            int offsetB = offset;
+            for (byte b : writeBytes) {
+                this.WriteByte(offsetB, b);
+                offsetB++;
+            }
+            i++;
+        }
+        return true;
     }
 }

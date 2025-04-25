@@ -1,4 +1,4 @@
-package com.example.flipnic_save_edit;
+package com.paktc.flipnic_save_edit;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -87,6 +87,17 @@ public class MainApp extends Application {
     }
 
 
+    public void SetAlertIcon(Alert a) {
+        Stage s = (Stage)a.getDialogPane().getScene().getWindow();
+        s.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("icon.png"))));
+    }
+
+    public void SetAlertTheme(Alert a) {
+        if (darkMode) {
+            a.getDialogPane().getScene().getStylesheets().add(Objects.requireNonNull(getClass().getResource("style.css")).toExternalForm());
+        }
+    }
+
     public Stage getPrimaryStage() {
         return this.primaryStage;
     }
@@ -106,13 +117,6 @@ public class MainApp extends Application {
             }
             this.rawData = Files.readAllBytes(path);
             this.fs = new FlipnicSave(this.rawData);
-            if (!fs.isValidSave()) {
-                Alert alert = new Alert(Alert.AlertType.WARNING);
-                alert.setTitle("Checksum mismatch");
-                alert.setHeaderText("Failed to validate checksums");
-                alert.setContentText("The save file may be corrupt");
-                alert.showAndWait();
-            }
             /*
             if (!fs.isValidHeader()) {
                 Alert alert = new Alert(Alert.AlertType.WARNING);
@@ -121,18 +125,7 @@ public class MainApp extends Application {
                 alert.showAndWait();
             }*/
             primaryStage.setTitle("Flipnic Save Editor " + this.version + " - " + saveFile.getName());
-            int totalMissions = 0;
-            for (int i = 0; i < 11; i++) {
-                totalMissions += this.fs.GetMissions(i).length;
-            }
-            if (totalMissions != this.fs.GetExpectedCount()) {
-                Alert alert = new Alert(Alert.AlertType.WARNING);
-                alert.setTitle("Stage status invalid");
-                alert.setHeaderText("Mission data may be corrupted");
-                alert.setContentText("Abnormal amount of missions detected: expected " + this.fs.GetExpectedCount() + ", actual " + totalMissions + "\nThis save file may be modified");
-                alert.showAndWait();
-            }
-            mainWindow.update(this.fs);
+            mainWindow.update(this.fs, true);
 
         } catch (IOException ie) {
             Alert alert = new Alert(Alert.AlertType.ERROR);

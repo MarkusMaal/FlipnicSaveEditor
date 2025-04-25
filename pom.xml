@@ -6,7 +6,7 @@
 
     <groupId>com.paktc</groupId>
     <artifactId>flipnic_save_edit</artifactId>
-    <version>0.9</version>
+    <version>1.0</version>
     <name>flipnic_save_edit</name>
 
     <properties>
@@ -85,7 +85,7 @@
                         <!-- Default configuration for running with: mvn clean javafx:run -->
                         <id>default-cli</id>
                         <configuration>
-                            <mainClass>com.example.flipnic_save_edit/com.example.flipnic_save_edit.MainApp
+                            <mainClass>com.paktc.flipnic_save_edit/com.paktc.flipnic_save_edit.MainApp
                             </mainClass>
                             <launcher>app</launcher>
                             <jlinkZipName>app</jlinkZipName>
