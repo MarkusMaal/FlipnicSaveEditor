@@ -115,7 +115,7 @@
                                 <Font name="Calibri" size="18.0" />
                             </font>
                         </Label>
-                        <Button fx:id="EditScoreButton" mnemonicParsing="false" onAction="#EditScoreClick" text="🖊️">
+                        <Button fx:id="EditScoreButton" mnemonicParsing="false" onAction="#EditScoreClick" text="🖊">
                             <FlowPane.margin>
                                 <Insets left="10.0" />
                             </FlowPane.margin>
@@ -151,7 +151,7 @@
                                 <Font name="Calibri" size="18.0" />
                             </font>
                         </Label>
-                        <Button fx:id="EditDifficultyButton" mnemonicParsing="false" onAction="#EditDifficultyClick" text="🖊️">
+                        <Button fx:id="EditDifficultyButton" mnemonicParsing="false" onAction="#EditDifficultyClick" text="🖊">
                             <FlowPane.margin>
                                 <Insets left="5.0" />
                             </FlowPane.margin>

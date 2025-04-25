@@ -43,6 +43,8 @@ public class MainApp extends Application {
         GetVersion();
 
         this.primaryStage = stage;
+        this.primaryStage.setMinWidth(665);
+        this.primaryStage.setMinHeight(450);
         this.primaryStage.setTitle("Flipnic Save Editor " + this.version);
         initRootLayout();
         showFirstForm();
