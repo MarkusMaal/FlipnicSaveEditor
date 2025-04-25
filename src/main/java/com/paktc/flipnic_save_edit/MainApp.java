@@ -51,9 +51,13 @@ public class MainApp extends Application {
     }
 
     private void GetVersion() throws IOException, XmlPullParserException {
-        MavenXpp3Reader reader = new MavenXpp3Reader();
-        Model model = reader.read(new FileReader("pom.xml"));
-        version = model.getVersion();
+        if (!Files.exists(Path.of("pom.xml"))) {
+            version = "1.0";
+        } else {
+            MavenXpp3Reader reader = new MavenXpp3Reader();
+            Model model = reader.read(new FileReader("pom.xml"));
+            version = model.getVersion();
+        }
     }
 
     private FXMLLoader initLayout(String resource) {
@@ -119,13 +123,6 @@ public class MainApp extends Application {
             }
             this.rawData = Files.readAllBytes(path);
             this.fs = new FlipnicSave(this.rawData);
-            /*
-            if (!fs.isValidHeader()) {
-                Alert alert = new Alert(Alert.AlertType.WARNING);
-                alert.setTitle("Header mismatch");
-                alert.setHeaderText("File header is not correct, but nobody cares");
-                alert.showAndWait();
-            }*/
             primaryStage.setTitle("Flipnic Save Editor " + this.version + " - " + saveFile.getName());
             mainWindow.update(this.fs, true);
 

@@ -306,11 +306,6 @@ public class RootLayout {
         What does "Force score mode" option under "Unlocks" tab do?
         
         It allows you to hack the save file in a way where it sets the current stage in original game to whatever you want and as a side effect you can replay that stage with score in original mode.
-
-
-        I want to analyze the save file format myself in a hex editor. How can I highlight sections of the save file we already know about?
-        
-        If you use ImHex, you can right click on the "Pattern editor" section of the window and select "Import Pattern File..." from the popup menu. Then import the "flipnicsave.hexpat" file from the root directory on FlipnicSaveEditor repository (git clone source tree first).
         """);
         alert.showAndWait();
     }
