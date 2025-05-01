@@ -33,6 +33,8 @@ public class MainApp extends Application {
 
     public String version;
     public String savePath = "";
+
+    public boolean autoUpdateChecksums = false;
     private static String args;
     public static String[] friendlyStageNames = "Biology A,Evolution A,Metallurgy A,Evolution B,Optics A,Evolution C,Biology B,Metallurgy B,Optics B,Geometry A,Evolution D".split(",");
     public static boolean darkMode = false;
@@ -52,7 +54,7 @@ public class MainApp extends Application {
 
     private void GetVersion() throws IOException, XmlPullParserException {
         if (!Files.exists(Path.of("pom.xml"))) {
-            version = "1.0";
+            version = "1.1";
         } else {
             MavenXpp3Reader reader = new MavenXpp3Reader();
             Model model = reader.read(new FileReader("pom.xml"));

@@ -384,4 +384,9 @@ public class RootLayout {
             e.printStackTrace();
         }
     }
+
+    @FXML
+    public void ToggleAutoUpdate(ActionEvent actionEvent) {
+        mainApp.autoUpdateChecksums = ((CheckMenuItem)actionEvent.getSource()).isSelected();
+    }
 }

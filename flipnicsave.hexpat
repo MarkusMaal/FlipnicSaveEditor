@@ -229,5 +229,6 @@ MissionMap mission_names @ 0x114C;
 MissionTypes missionTypes[11] @ 0x194C;
 StageProgression stage_status_original_game[11] @ 0x214C;
 StageProgression stage_status_freeplay[11] @ 0x234C;
+StageProgression stage_status_current[11] @ 0x254C;
 Subpages mission_subpages[11] @ 0x1F4C;
 HelpIndicies mission_image_indicies[11] @ 0x1D4C;

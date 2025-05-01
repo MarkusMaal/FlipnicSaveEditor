@@ -36,6 +36,9 @@ public class FirstForm {
     public Button EditDifficultyButton;
     public ComboBox EditDifficultyCombobox;
     public Label CurrentDifficultyLabel;
+    public RadioButton statusOriginalGameRadioButton;
+    public RadioButton statusFreePlayRadioButton;
+    public RadioButton statusLastPlaythroughRadioButton;
     // information
     @FXML
     private Button updateSumsButton;
@@ -78,6 +81,11 @@ public class FirstForm {
 
     // unlocks
     private final ToggleGroup grp = new ToggleGroup();
+
+    // stage status type selector
+    @FXML
+    ToggleGroup stageStatusGroup;
+
     @FXML
     private RadioButton freeRad;
     @FXML
@@ -212,6 +220,10 @@ public class FirstForm {
         locked = true;
         windowTabs.setDisable(!fs.isLoaded());
         if (fs.isLoaded()) {
+            // update checksums
+            if (mainApp.autoUpdateChecksums) {
+                mainApp.fs.UpdateChecksum();
+            }
             // information
             redundantChecksumLabel.setText(fs.GetChecksum(false) + " (" + (fs.ConfirmChecksums(false) ? "Valid" : "Invalid") + ")");
             checkSumLabel.setText(fs.GetChecksum(true) + " (" + (fs.ConfirmChecksums(true) ? "Valid" : "Invalid") + ")");
@@ -285,6 +297,12 @@ public class FirstForm {
         DisableTableSorting(stageDirTable.getColumns());
     }
 
+    private FlipnicSave.MissionSource GetMissionSource() {
+        if (statusFreePlayRadioButton.isSelected()) return FlipnicSave.MissionSource.FREE_PLAY;
+        else if (statusLastPlaythroughRadioButton.isSelected()) return FlipnicSave.MissionSource.LAST_PLAYED;
+        else return FlipnicSave.MissionSource.ORIGINAL_GAME;
+    }
+
     @SuppressWarnings("unchecked")
     @FXML
     private void onMissionStageChanged() {
@@ -293,7 +311,7 @@ public class FirstForm {
             stageStatusTable.getColumns().clear();
             MModel model = new MModel();
             int statusIdx = missionsComboBox.getSelectionModel().getSelectedIndex();
-            String[] status = mainApp.fs.GetStageStatus(statusIdx);
+            String[] status = mainApp.fs.GetStageStatus(statusIdx, GetMissionSource());
             String[] types = mainApp.fs.GetMissionTypes(statusIdx);
             int[] indicies = mainApp.fs.GetMissionIndicies(statusIdx);
             int[] pages = mainApp.fs.GetMissionPages(statusIdx);
@@ -673,7 +691,7 @@ public class FirstForm {
                     break;
             }
             if (locked) return;
-            mainApp.fs.SetStageStatus(missionsComboBox.getSelectionModel().getSelectedIndex(), stageStatusTable.getSelectionModel().getSelectedIndex(), value);
+            mainApp.fs.SetStageStatus(missionsComboBox.getSelectionModel().getSelectedIndex(), stageStatusTable.getSelectionModel().getSelectedIndex(), value, GetMissionSource());
             update(mainApp.fs);
         }
 

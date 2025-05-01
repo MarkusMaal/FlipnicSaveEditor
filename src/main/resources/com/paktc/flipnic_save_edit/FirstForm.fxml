@@ -318,13 +318,21 @@
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                 <ComboBox fx:id="missionsComboBox" accessibleRoleDescription="Stage name" layoutX="14.0" layoutY="14.0" onAction="#onMissionStageChanged" prefHeight="25.0" prefWidth="575.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
                 <Label fx:id="missionsLabel" layoutX="14.0" layoutY="46.0" text="Nothing to show here..." AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="50.0" />
-                <TableView fx:id="stageStatusTable" accessibleRoleDescription="List of missions" editable="true" layoutX="10.0" layoutY="43.0" prefHeight="322.0" prefWidth="578.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="50.0">
+                <TableView fx:id="stageStatusTable" accessibleRoleDescription="List of missions" editable="true" layoutX="10.0" layoutY="43.0" prefHeight="322.0" prefWidth="578.0" AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="50.0">
                     <columns>
                         <TableColumn prefWidth="75.0" text="Type" />
                         <TableColumn prefWidth="437.0" text="Mission" />
                         <TableColumn minWidth="0.0" prefWidth="141.0" text="Status" />
                     </columns>
                 </TableView>
+            <RadioButton fx:id="statusOriginalGameRadioButton" accessibleRoleDescription="Mission data source: Original game" accessibleText="Display mission data from original game" layoutX="14.0" layoutY="327.0" mnemonicParsing="false" onAction="#onMissionStageChanged" selected="true" text="Original game" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="150.0">
+               <toggleGroup>
+                  <ToggleGroup fx:id="stageStatusGroup" />
+               </toggleGroup>
+            </RadioButton>
+            <RadioButton fx:id="statusFreePlayRadioButton" accessibleRoleDescription="Mission data source: Free play" accessibleText="Display mission data from Free Play" layoutX="133.0" layoutY="341.0" mnemonicParsing="false" onAction="#onMissionStageChanged" text="Free play" toggleGroup="$stageStatusGroup" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="270.0" />
+            <RadioButton fx:id="statusLastPlaythroughRadioButton" accessibleRoleDescription="Mission data source: Last playthrough" accessibleText="Display mission data from last playthrough" layoutX="233.0" layoutY="341.0" mnemonicParsing="false" onAction="#onMissionStageChanged" text="Last playthrough" toggleGroup="$stageStatusGroup" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="360.0" />
+            <Label layoutX="10.0" layoutY="319.0" text="Mission data source:" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" />
             </AnchorPane>
         </Tab>
         <Tab text="Stages">

@@ -26,7 +26,7 @@ public class TransferUtil {
     }
 
     public void TransferMissions() throws IOException {
-        this.TransferBlock(0x110C, 0x24AB);
+        this.TransferBlock(0x110C, 0x26AB);
     }
 
     public void TransferUnlocks() throws IOException {

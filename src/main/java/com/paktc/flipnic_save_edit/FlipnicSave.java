@@ -62,6 +62,12 @@ public class FlipnicSave {
         HARD
     }
 
+    public enum MissionSource {
+        ORIGINAL_GAME,
+        FREE_PLAY,
+        LAST_PLAYED
+    }
+
     // primary constructor
     public FlipnicSave(byte[] data) {
         for (byte b : data) {
@@ -600,11 +606,18 @@ public class FlipnicSave {
         }
     }
 
-    public String[] GetStageStatus(int idx) {
-        if (0x214C + (idx * 0x20) >= this.dataList.size()) {
+    public String[] GetStageStatus(int idx, MissionSource ms) {
+        int initial_offset;
+        switch (ms) {
+            case FREE_PLAY -> initial_offset = 0x234C;
+            case ORIGINAL_GAME -> initial_offset = 0x214C;
+            case LAST_PLAYED -> initial_offset = 0x254C;
+            default -> initial_offset = 0x00;
+        }
+        if (initial_offset + (idx * 0x20) >= this.dataList.size()) {
             return new String[0];
         } else {
-            int offset = 0x214C + (idx * 0x20);
+            int offset = initial_offset + (idx * 0x20);
             ArrayList<String> status = new ArrayList<>();
             for (int x = offset; x < offset + 0x20; x++) {
                 switch (ReadByte(x))
@@ -628,11 +641,18 @@ public class FlipnicSave {
         }
     }
 
-    public void SetStageStatus(int stage, int idx, String value) {
-        if (0x214C + (stage * 0x20) + idx >= this.dataList.size()) {
+    public void SetStageStatus(int stage, int idx, String value, MissionSource ms) {
+        int initial_offset;
+        switch (ms) {
+            case FREE_PLAY -> initial_offset = 0x234C;
+            case ORIGINAL_GAME -> initial_offset = 0x214C;
+            case LAST_PLAYED -> initial_offset = 0x254C;
+            default -> initial_offset = 0x00;
+        }
+        if (initial_offset + (stage * 0x20) + idx >= this.dataList.size()) {
             return;
         }
-        int offset = 0x214C + (stage * 0x20) + idx;
+        int offset = initial_offset + (stage * 0x20) + idx;
         byte val = 0x00;
         switch (value) {
             case "Started":
