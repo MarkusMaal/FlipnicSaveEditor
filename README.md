@@ -119,6 +119,8 @@ This pages value directly dictates how many subpages a mission in stage status m
 
 **DISCLAIMER**: Using numbers that don't correspond to any file can cause the game to soft-lock or crash!
 
+You can also change where to get the mission data from. Flipnic stores separate completion tables for original game (default), free play and also for the last played stage.
+
 ### Changing stages in original game
 
 ![Stages](img/stages.png)
