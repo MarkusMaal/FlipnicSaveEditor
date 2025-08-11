@@ -300,14 +300,14 @@ public class FlipnicSave {
         return Arrays.equals(reference, actual);
     }
 
-    public int GetCurrentScore() {
-        byte[] scoreData = this.ReadBytesLE(0x28, 0x4);
-        return ByteBuffer.wrap(scoreData).getInt();
+    public long GetCurrentScore() {
+        byte[] scoreData = this.ReadBytesLE(0x28, 0x8);
+        return ByteBuffer.wrap(scoreData).getLong();
     }
 
-    public void SetCurrentScore(int value) {
-        ByteBuffer buffer = ByteBuffer.allocate(Integer.BYTES);
-        buffer.putInt(value);
+    public void SetCurrentScore(long value) {
+        ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
+        buffer.putLong(value);
         byte[] scoreData = this.ReverseArray(buffer.array());
         int offset = 0x28;
         for (byte b : scoreData) {
@@ -384,22 +384,21 @@ public class FlipnicSave {
         return ByteBuffer.wrap(this.ReadBytesLE(0x10C8, 0x4)).getInt();
     }
 
-    public void SetScore(int mode, int idx, int score, String initials, int combos, Difficulty difficulty) {
+    public void SetScore(int mode, int idx, long score, String initials, int combos, Difficulty difficulty) {
         if (!isLoaded()) {
             return;
         }
         int offset = 0x60+((5*mode+idx) * 0x38);
         byte[] scoreData = ReadBytes(offset, 0x38);
-        ByteBuffer b = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(score);
+        ByteBuffer b = ByteBuffer.allocate(8).order(ByteOrder.LITTLE_ENDIAN).putLong(score);
         ByteBuffer comboBuffer = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(combos);
         ByteBuffer diffBuffer = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(difficulty.ordinal());
         CharBuffer chr = CharBuffer.wrap(initials);
         ByteBuffer cb = StandardCharsets.UTF_8.encode(chr);
         byte[] inb = Arrays.copyOfRange(cb.array(), cb.position(), cb.limit());
-        scoreData[0] = b.array()[0];
-        scoreData[1] = b.array()[1];
-        scoreData[2] = b.array()[2];
-        scoreData[3] = b.array()[3];
+        for (int i = 0; i < 8; i++) {
+            scoreData[i] = b.array()[i];
+        }
         scoreData[0x10] = inb[0];
         scoreData[0x11] = inb[1];
         scoreData[0x12] = inb[2];
@@ -422,8 +421,8 @@ public class FlipnicSave {
         }
         int offset = 0x60+(idx * 0x38);
         byte[] scoreData = ReadBytes(offset, 0x38);
-        byte[] scoreValBytes = { scoreData[3], scoreData[2], scoreData[1], scoreData[0] };
-        int scoreVal = ByteBuffer.wrap(scoreValBytes).getInt();
+        byte[] scoreValBytes = { scoreData[7], scoreData[6], scoreData[5], scoreData[4], scoreData[3], scoreData[2], scoreData[1], scoreData[0] };
+        long scoreVal = ByteBuffer.wrap(scoreValBytes).getLong();
         int modeIdx = (idx - (idx % 5)) / 5;
         int rank = idx % 5;
         rank++;

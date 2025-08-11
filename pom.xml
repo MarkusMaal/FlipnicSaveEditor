@@ -113,6 +113,21 @@
                             <noHeaderFiles>true</noHeaderFiles>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>run</id>
+                        <configuration>
+                            <mainClass>com.paktc.flipnic_save_edit/com.paktc.flipnic_save_edit.MainApp</mainClass>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>debug</id>
+                        <configuration>
+                            <mainClass>com.paktc.flipnic_save_edit/com.paktc.flipnic_save_edit.MainApp</mainClass>
+                            <options>
+                                <option>-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:8000</option>
+                            </options>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>

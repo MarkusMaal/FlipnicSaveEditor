@@ -570,7 +570,7 @@ public class FirstForm {
             return;
         }
         try {
-            mainApp.fs.SetCurrentScore(Integer.parseInt(ScoreEditField.getText()));
+            mainApp.fs.SetCurrentScore(Long.parseLong(ScoreEditField.getText()));
         } catch (NumberFormatException e) {
             return;
         }
@@ -851,7 +851,7 @@ public class FirstForm {
                 default -> diff;
             };
             if (locked) return;
-            mainApp.fs.SetScore(gameModeSelector.getSelectionModel().getSelectedIndex(), rankingTable.getSelectionModel().getSelectedIndex(), Integer.parseInt(getScore()), getInitials(), Integer.parseInt(getCombos()), diff);
+            mainApp.fs.SetScore(gameModeSelector.getSelectionModel().getSelectedIndex(), rankingTable.getSelectionModel().getSelectedIndex(), Long.parseLong(getScore()), getInitials(), Integer.parseInt(getCombos()), diff);
             update(mainApp.fs);
         }
     }

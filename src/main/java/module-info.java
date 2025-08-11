@@ -8,6 +8,7 @@ module com.paktc.flipnic_save_edit {
     requires maven.model;
     requires plexus.utils;
     requires java.desktop;
+    requires javafx.base;
 
     opens com.paktc.flipnic_save_edit to javafx.fxml;
     exports com.paktc.flipnic_save_edit;
