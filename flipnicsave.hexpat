@@ -11,7 +11,7 @@ u32 CalculatedCRC32 = std::hash::crc32(pD, 0xFFFFFFFF, 0x4C11DB7, 0x0, true, tru
 u64 Magic @ 0x00;
 u32 SecondaryCRC32 @ 0x08 [[name("Secondary checksum (CRC32)")]];
 u32 PrimaryCRC32 @ 0x0C [[name("Primary checksum (CRC32)")]];
-u32 Score @ 0x28;
+s64 Score @ 0x28;
 u32 Combos @ 0x34;
 u32 OriginalGameStage @ 0x10C8 [[name("Original game stage")]];
 u32 Footer @ 0x277C;
@@ -144,8 +144,7 @@ struct String {
 };
 
 struct ScoreRow {
-    u32 Score;
-    padding[4];
+    s64 Score;
     Difficulty Difficulty;
     u32 Combos;
     String InitialsArea [[name("Initials (reserved area)")]];
