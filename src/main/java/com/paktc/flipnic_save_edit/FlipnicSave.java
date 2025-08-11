@@ -565,7 +565,7 @@ public class FlipnicSave {
         if (0x114C + (stage * 0x80) + idx >= this.dataList.size()) {
             return;
         }
-        int offset = 0x114C + (stage * 0x80) + idx;
+        int offset = 0x114C + (stage * 0x80) + (idx*4);
         byte stringIdx = 0;
         for (String str : validStrings) {
             if (str.equals(value)) {
@@ -740,7 +740,7 @@ public class FlipnicSave {
     }
 
     public void SetMissionIndex(int stage, int row, int value) {
-        int offset = 0x1D4C + (stage * 0x20) + row;
+        int offset = 0x1D4C + (stage* 0x20) + row;
         WriteByte(offset, (byte)value);
     }
 
