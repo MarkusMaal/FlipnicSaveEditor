@@ -151,7 +151,7 @@ This program should automatically switch to NTSC-J naming scheme (e.g. Theology 
 
 ![NTSC-J fixes](img/ntscjfixes.png)
 
-You may also notice that if you go to missions tab, the names of all the missions are wrong. That's because the original Japanese version uses a slightly different message table and so to fix this, you'd have to import a JA.MSG file from the same menu. This file can be extracted from RES.BIN file using extraction software I've made, including [FlipnicBinExtractor](https://github.com/MarkusMaal/FlipnicBinExtractor) (CLI) and [FlipnicFs](https://github.com/MarkusMaal/FlipnicFs) (GUI).
+You may also notice that if you go to missions tab, the names of all the missions are wrong. That's because the original Japanese version uses a slightly different message table and so to fix this, you'd have to import a JA.MSG file from the same menu. This file can be extracted from RES.BIN file using extraction software I've made, including [FlipnicFileTools](https://github.com/MarkusMaal/FlipnicFileTools) and [FlipnicBinExtractor](https://github.com/MarkusMaal/FlipnicBinExtractor) (CLI).
 
 # Creating hybrid saves
 
