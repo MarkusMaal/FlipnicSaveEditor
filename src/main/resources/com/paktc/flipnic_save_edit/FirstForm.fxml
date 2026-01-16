@@ -23,6 +23,7 @@
                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                     </rowConstraints>
                     <Label fx:id="checkSumLabel" accessibleRoleDescription="Checksum value" accessibleText="A unique identifier, for verifying save file integrity" alignment="TOP_LEFT" prefHeight="23.0" prefWidth="291.0" text="No file loaded" textAlignment="CENTER" GridPane.columnIndex="1">
                         <font>
@@ -48,7 +49,7 @@
                             <Insets right="5.0" />
                         </GridPane.margin>
                     </Label>
-                    <Label alignment="CENTER_RIGHT" prefHeight="21.0" prefWidth="296.0" text="Current stage:" GridPane.halignment="RIGHT" GridPane.rowIndex="4">
+                    <Label alignment="CENTER_RIGHT" prefHeight="21.0" prefWidth="296.0" text="Current stage:" GridPane.halignment="RIGHT" GridPane.rowIndex="5">
                         <font>
                             <Font name="Calibri" size="17.0" />
                         </font>
@@ -56,7 +57,7 @@
                             <Insets right="5.0" />
                         </GridPane.margin>
                     </Label>
-                    <Label fx:id="currentStageLabel" accessibleText="Current stage in original game" text="Biology A" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                    <Label fx:id="currentStageLabel" accessibleText="Current stage in original game" text="Biology A" GridPane.columnIndex="1" GridPane.rowIndex="5">
                         <font>
                             <Font name="Calibri" size="18.0" />
                         </font>
@@ -80,15 +81,18 @@
                             <Font name="Calibri" size="17.0" />
                         </font>
                     </Label>
-                    <Label alignment="CENTER_RIGHT" prefHeight="21.0" prefWidth="296.0" text="Last stage played:" GridPane.halignment="RIGHT" GridPane.rowIndex="5">
+                    <Label alignment="CENTER_RIGHT" prefHeight="21.0" prefWidth="296.0" text="Last stage played:" GridPane.halignment="RIGHT" GridPane.rowIndex="6">
                         <font>
                             <Font name="Calibri" size="17.0" />
                         </font>
                         <GridPane.margin>
                             <Insets right="5.0" />
                         </GridPane.margin>
+                  <opaqueInsets>
+                     <Insets />
+                  </opaqueInsets>
                     </Label>
-                    <Label fx:id="lastPlayedStageLabel" accessibleText="Last stage that was played with this save file" text="N/A" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                    <Label fx:id="lastPlayedStageLabel" accessibleText="Last stage that was played with this save file" text="N/A" GridPane.columnIndex="1" GridPane.rowIndex="6">
                         <font>
                             <Font name="Calibri" size="17.0" />
                         </font>
@@ -96,12 +100,12 @@
                             <Insets left="5.0" />
                         </GridPane.margin>
                     </Label>
-                    <Button fx:id="updateSumsButton" accessibleText="Updating checksums ensures that the save file is not seen as corrupted by the game." onAction="#updateChecksums" text="_Update checksums" GridPane.halignment="RIGHT" GridPane.rowIndex="6">
+                    <Button fx:id="updateSumsButton" accessibleText="Updating checksums ensures that the save file is not seen as corrupted by the game." onAction="#updateChecksums" text="_Update checksums" GridPane.halignment="RIGHT" GridPane.rowIndex="7">
                         <GridPane.margin>
                             <Insets right="5.0" />
                         </GridPane.margin>
                     </Button>
-                    <Button accessibleText="Fix other save file problems, such as the file size, headers and footers, etc." onAction="#applyFixes" text="Diagnose save _file" GridPane.columnIndex="1" GridPane.rowIndex="6">
+                    <Button accessibleText="Fix other save file problems, such as the file size, headers and footers, etc." onAction="#applyFixes" text="Diagnose save _file" GridPane.columnIndex="1" GridPane.rowIndex="7">
                         <GridPane.margin>
                             <Insets left="5.0" />
                         </GridPane.margin>
@@ -157,6 +161,32 @@
                             </FlowPane.margin>
                         </Button>
                     </FlowPane>
+               <Label alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefHeight="22.0" prefWidth="294.0" text="Combos:" textAlignment="RIGHT" GridPane.halignment="RIGHT" GridPane.rowIndex="4">
+                  <font>
+                     <Font name="Calibri" size="17.0" />
+                  </font>
+                  <GridPane.margin>
+                     <Insets right="5.0" />
+                  </GridPane.margin>
+               </Label>
+               <FlowPane alignment="CENTER_LEFT" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="4" GridPane.valignment="CENTER">
+                  <children>
+                     <Label fx:id="currentCombosLabel" prefHeight="21.0" text="0">
+                        <font>
+                           <Font name="Calibri" size="17.0" />
+                        </font>
+                     </Label>
+                     <Button fx:id="EditCombosButton" mnemonicParsing="false" onAction="#EditCombosClick" text="🖊">
+                        <FlowPane.margin>
+                           <Insets left="10.0" />
+                        </FlowPane.margin>
+                     </Button>
+                     <TextField fx:id="CombosEditField" onKeyPressed="#CombosFieldKeyPress" visible="false" />
+                  </children>
+                  <GridPane.margin>
+                     <Insets left="5.0" />
+                  </GridPane.margin>
+               </FlowPane>
                 </GridPane>
             </AnchorPane>
         </Tab>

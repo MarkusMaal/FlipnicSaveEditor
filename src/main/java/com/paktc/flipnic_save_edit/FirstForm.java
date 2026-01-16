@@ -33,7 +33,9 @@ public class FirstForm {
     public TabPane windowTabs;
     public Button EditScoreButton;
     public TextField ScoreEditField;
+    public TextField CombosEditField;
     public Button EditDifficultyButton;
+    public Button EditCombosButton;
     public ComboBox EditDifficultyCombobox;
     public Label CurrentDifficultyLabel;
     public RadioButton statusOriginalGameRadioButton;
@@ -49,6 +51,9 @@ public class FirstForm {
 
     @FXML
     private Label currentScoreLabel;
+
+    @FXML
+    private Label currentCombosLabel;
 
     @FXML
     private Label currentStageLabel;
@@ -229,6 +234,7 @@ public class FirstForm {
             checkSumLabel.setText(fs.GetChecksum(true) + " (" + (fs.ConfirmChecksums(true) ? "Valid" : "Invalid") + ")");
             currentScoreLabel.setText(String.valueOf(fs.GetCurrentScore()));
             currentStageLabel.setText(fs.GetCurrentStage());
+            currentCombosLabel.setText(String.valueOf(fs.GetCurrentCombos()));
             lastPlayedStageLabel.setText(fs.GetLastPlayedStage());
             CurrentDifficultyLabel.setText(fs.GetCurrentDifficulty());
             // options
@@ -565,6 +571,17 @@ public class FirstForm {
     }
 
     @FXML
+    public void EditCombosClick(ActionEvent actionEvent) {
+        EditCombosButton.setVisible(false);
+        EditCombosButton.setManaged(false);
+        currentCombosLabel.setVisible(false);
+        currentCombosLabel.setManaged(false);
+        CombosEditField.setText(currentCombosLabel.getText());
+        CombosEditField.setVisible(true);
+        CombosEditField.requestFocus();
+    }
+
+    @FXML
     public void ScoreFieldKeyPress(KeyEvent keyEvent) {
         if (keyEvent.getCode() != KeyCode.ENTER) {
             return;
@@ -579,6 +596,24 @@ public class FirstForm {
         currentScoreLabel.setVisible(true);
         currentScoreLabel.setManaged(true);
         ScoreEditField.setVisible(false);
+        update(mainApp.fs);
+    }
+
+    @FXML
+    public void CombosFieldKeyPress(KeyEvent keyEvent) {
+        if (keyEvent.getCode() != KeyCode.ENTER) {
+            return;
+        }
+        try {
+            mainApp.fs.SetCurrentCombos(Integer.parseInt(CombosEditField.getText()));
+        } catch (NumberFormatException e) {
+            return;
+        }
+        EditCombosButton.setVisible(true);
+        EditCombosButton.setManaged(true);
+        currentCombosLabel.setVisible(true);
+        currentCombosLabel.setManaged(true);
+        CombosEditField.setVisible(false);
         update(mainApp.fs);
     }
 

@@ -6,7 +6,7 @@
 
     <groupId>com.paktc</groupId>
     <artifactId>flipnic_save_edit</artifactId>
-    <version>1.1.1</version>
+    <version>1.1.2</version>
     <name>flipnic_save_edit</name>
 
     <properties>

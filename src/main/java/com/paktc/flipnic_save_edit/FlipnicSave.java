@@ -300,6 +300,22 @@ public class FlipnicSave {
         return Arrays.equals(reference, actual);
     }
 
+    public int GetCurrentCombos() {
+        byte[] comboData = this.ReadBytesLE(0x34, 0x4);
+        return ByteBuffer.wrap(comboData).getInt();
+    }
+
+    public void SetCurrentCombos(int value) {
+        ByteBuffer buffer = ByteBuffer.allocate(Integer.BYTES);
+        buffer.putInt(value);
+        byte[] comboData = this.ReverseArray(buffer.array());
+        int offset = 0x34;
+        for (byte b : comboData) {
+            WriteByte(offset, b);
+            offset++;
+        }
+    }
+
     public long GetCurrentScore() {
         byte[] scoreData = this.ReadBytesLE(0x28, 0x8);
         return ByteBuffer.wrap(scoreData).getLong();

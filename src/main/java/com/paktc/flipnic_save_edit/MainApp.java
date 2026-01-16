@@ -54,7 +54,7 @@ public class MainApp extends Application {
 
     private void GetVersion() throws IOException, XmlPullParserException {
         if (!Files.exists(Path.of("pom.xml"))) {
-            version = "1.1.1";
+            version = "1.1.2";
         } else {
             MavenXpp3Reader reader = new MavenXpp3Reader();
             Model model = reader.read(new FileReader("pom.xml"));
